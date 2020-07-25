@@ -6,27 +6,45 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Tweether is Ownable {
   struct Tweeth {
-    uint256 nonce;
     address owner;
+    uint256 nonce;
     string text;
     address[] mentions;
   }
 
-  mapping(bytes32 => Tweeth) public tweeths;
+  uint256 public maxBytes;
+  uint256 public maxMentions;
 
+  mapping(bytes32 => Tweeth) public tweeths;
   mapping(address => uint256) public nonceCounter;
 
-  function sendTweeth(string memory text, address[] memory mentions) public {
-      uint256 nonce = nonceCounter[msg.sender]++;
-      Tweeth storage newTweeth = tweeths[keccak256(abi.encodePacked(msg.sender, nonce))];
+  constructor(uint256 _maxBytes, uint256 _maxMentions) public {
+    maxBytes = _maxBytes;
+    maxMentions = _maxMentions;
+  }
 
-      newTweeth.nonce = nonce;
-      newTweeth.owner = msg.sender;
-      newTweeth.text = text;
-      newTweeth.mentions = mentions;
+  function setMaxCharacters(uint256 _maxBytes) public onlyOwner {
+    maxBytes = _maxBytes;
+  }
+
+  function setMaxMentions(uint256 _maxMentions) public onlyOwner {
+    maxMentions = _maxMentions;
+  }
+
+  function sendTweeth(string memory text, address[] memory mentions) public {
+    require(bytes(text).length <= maxBytes, "Maximum bytes exceeded");
+    require(mentions.length <= maxMentions, "Maximum mentions exceeded");
+
+    uint256 nonce = nonceCounter[msg.sender]++;
+    Tweeth storage newTweeth = tweeths[keccak256(abi.encodePacked(msg.sender, nonce))];
+
+    newTweeth.owner = msg.sender;
+    newTweeth.nonce = nonce;
+    newTweeth.text = text;
+    newTweeth.mentions = mentions;
   }
 
   function getTweeth(address owner, uint256 nonce) public view returns (Tweeth memory) {
-      return tweeths[keccak256(abi.encodePacked(owner, nonce))];
+    return tweeths[keccak256(abi.encodePacked(owner, nonce))];
   }
 }
