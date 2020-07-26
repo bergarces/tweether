@@ -5,6 +5,13 @@ pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Tweether is Ownable {
+  event TweethSent(
+    address indexed _owner,
+    uint256 indexed _nonce,
+    string _text,
+    address[] mentions
+  );
+
   struct Tweeth {
     address owner;
     uint256 nonce;
@@ -42,6 +49,8 @@ contract Tweether is Ownable {
     newTweeth.nonce = nonce;
     newTweeth.text = text;
     newTweeth.mentions = mentions;
+
+    emit TweethSent(msg.sender, nonce, text, mentions);
   }
 
   function getTweeth(address owner, uint256 nonce) public view returns (Tweeth memory) {
