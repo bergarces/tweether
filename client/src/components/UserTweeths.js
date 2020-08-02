@@ -1,19 +1,20 @@
 import React, { useContext, useEffect, useState } from 'react'
 
+import ListGroup from 'react-bootstrap/ListGroup'
+
 import Web3ProviderContext from '../contexts/Web3ProviderContext'
 
 import Tweeth from './Tweeth'
 
-function UserTweeths(props) {
+function UserTweeths({ searchQuery, maxTweeths }) {
   const { contract } = useContext(Web3ProviderContext)
   const [tweethNonces, setTweethNonces] = useState([])
 
-  const { account, maxTweeths } = props
-
   useEffect(() => {
+    console.log(`Searching tweeths for: ${searchQuery}`)
     const init = async () => {
-      if (contract && account) {
-        const userNonce = await contract.methods.nonceCounter(account).call()
+      if (contract && searchQuery) {
+        const userNonce = await contract.methods.nonceCounter(searchQuery).call()
 
         const firstNonce = Math.max(userNonce - maxTweeths, 0)
         const lastNonce = userNonce - 1
@@ -23,21 +24,19 @@ function UserTweeths(props) {
           (v, k) => k + firstNonce
         )
 
-        console.log(tweethNonces)
-
         setTweethNonces(tweethNonces)
       }
     }
 
     init()
-  }, [contract, account, maxTweeths])
+  }, [contract, searchQuery, maxTweeths])
 
   return (
-    <ul>
+    <ListGroup>
       {tweethNonces.map((nonce) => (
-        <Tweeth key={nonce.toString()} account={account} nonce={nonce} />
+        <Tweeth key={nonce.toString()} account={searchQuery} nonce={nonce} />
       ))}
-    </ul>
+    </ListGroup>
   )
 }
 

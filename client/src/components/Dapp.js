@@ -1,14 +1,21 @@
 import React, { useEffect, useState } from 'react'
 import * as Web3 from 'web3'
 
+import Button from 'react-bootstrap/Button'
+import Col from 'react-bootstrap/Col'
+import Row from 'react-bootstrap/Row'
+
 import Web3ProviderContext from '../contexts/Web3ProviderContext'
 import TweetherArtifact from '../contracts/Tweether.json'
 
-import SendTweeth from './SendTweeth'
-import Tweeth from './Tweeth'
-import UserTweeths from './UserTweeths'
+import SendTweethModal from './SendTweethModal'
+import SearchTweeths from './SearchTweeths'
 
 function Dapp() {
+  const [show, setShow] = useState(false)
+  const handleClose = () => setShow(false)
+  const handleShow = () => setShow(true)
+
   const [web3Provider, setWeb3Provider] = useState(undefined)
   const [account, setAccount] = useState(undefined)
   const [contract, setContract] = useState(undefined)
@@ -40,12 +47,20 @@ function Dapp() {
 
   return (
     <Web3ProviderContext.Provider value={{ web3Provider, account, contract }}>
-      <div>
-        <SendTweeth />
-        <br />
-        <br />
-        <UserTweeths account={account} maxTweeths={10} />
-      </div>
+      <Row className="justify-content-md-center mb-4">
+        <Col md="auto">
+          <Button variant="primary" onClick={handleShow}>
+            Send a Tweeth!
+          </Button>
+        </Col>
+      </Row>
+      <Row className="justify-content-md-center mb-4">
+        <Col md="auto">
+          <SearchTweeths account={account} maxTweeths={10} />
+        </Col>
+      </Row>
+
+      <SendTweethModal show={show} handleClose={handleClose} />
     </Web3ProviderContext.Provider>
   )
 }

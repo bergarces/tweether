@@ -1,5 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react'
 
+import Button from 'react-bootstrap/Button'
+import Card from 'react-bootstrap/Card'
+import ListGroup from 'react-bootstrap/ListGroup'
+
 import Web3ProviderContext from '../contexts/Web3ProviderContext'
 
 function Tweeth(props) {
@@ -24,15 +28,15 @@ function Tweeth(props) {
   }, [contract, account, nonce])
 
   return (
-    <li>
-      <label>Tweeth Content:</label> {tweeth?.text}
-      <br />
-      <br />
-      <label>From:</label> {tweeth?.owner}
-      <br />
-      <br />
-      <label>Nonce:</label> {tweeth?.nonce}
-    </li>
+    <ListGroup.Item>
+      <Card>
+        <Card.Body>
+          <Card.Title>{tweeth?.owner}</Card.Title>
+          <Card.Text>{tweeth?.text}</Card.Text>
+          <Button variant="primary">Go somewhere</Button>
+        </Card.Body>
+      </Card>
+    </ListGroup.Item>
   )
 }
 
