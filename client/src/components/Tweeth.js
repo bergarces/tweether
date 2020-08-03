@@ -10,22 +10,21 @@ function Tweeth(props) {
   const { contract } = useContext(Web3ProviderContext)
   const [tweeth, setTweeth] = useState(undefined)
 
-  const { account, nonce } = props
+  const { address, nonce } = props
 
   useEffect(() => {
     const init = async () => {
-      if (contract && account) {
+      if (contract && address) {
         const fetchedTweeth = await contract.methods
-          .getTweeth(account, nonce)
+          .getTweeth(address, nonce)
           .call()
-        console.log(fetchedTweeth)
 
         setTweeth(fetchedTweeth)
       }
     }
 
     init()
-  }, [contract, account, nonce])
+  }, [contract, address, nonce])
 
   return (
     <ListGroup.Item>

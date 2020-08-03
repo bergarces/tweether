@@ -11,8 +11,6 @@ function SendTweethModal({ show, handleClose }) {
   const { register, handleSubmit, errors } = useForm()
 
   const onSubmit = async (formData) => {
-    console.log(formData)
-
     contract.methods.sendTweeth(formData.text, []).send({ from: account })
     handleClose()
   }
@@ -43,7 +41,7 @@ function SendTweethModal({ show, handleClose }) {
           <Button variant="secondary" onClick={handleClose}>
             Close
           </Button>
-          <Button variant="submit" type="submit">
+          <Button variant="primary" type="submit">
             Save Changes
           </Button>
         </Modal.Footer>

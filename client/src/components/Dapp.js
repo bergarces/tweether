@@ -40,6 +40,11 @@ function Dapp() {
       setWeb3Provider(web3Provider)
       setContract(contract)
       setAccount(account)
+
+      web3Provider.eth.ens.registryAddress = '0xD05eb4322Be68A45a5F82Bc69E552047c51078b4'
+      const account1 = await web3Provider.eth.ens.getAddress('account1.test')
+      const tweether = await web3Provider.eth.ens.getAddress('tweether.test')
+      console.log({account1, tweether})
     }
 
     init()
