@@ -30,7 +30,7 @@ contract Tweether is Ownable {
     maxMentions = _maxMentions;
   }
 
-  function setMaxCharacters(uint256 _maxBytes) public onlyOwner {
+  function setMaxBytes(uint256 _maxBytes) public onlyOwner {
     maxBytes = _maxBytes;
   }
 

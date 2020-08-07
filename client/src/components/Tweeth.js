@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
 
-import Button from 'react-bootstrap/Button'
 import Card from 'react-bootstrap/Card'
 import ListGroup from 'react-bootstrap/ListGroup'
 
@@ -32,7 +31,6 @@ function Tweeth(props) {
         <Card.Body>
           <Card.Title>{tweeth?.owner}</Card.Title>
           <Card.Text>{tweeth?.text}</Card.Text>
-          <Button variant="primary">Go somewhere</Button>
         </Card.Body>
       </Card>
     </ListGroup.Item>
