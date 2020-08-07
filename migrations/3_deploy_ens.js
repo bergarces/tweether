@@ -12,7 +12,6 @@ const tld = "test";
 const TWEETHER_LABEL = "tweether"
 const TWEETHER_ROOT_LABEL = `${TWEETHER_LABEL}.${tld}`
 const TWEETHER_NODE = namehash.hash(TWEETHER_ROOT_LABEL)
-const TWEETHER_ADDRESS = "0x794A241741f1678076dc0C36ccD37737C73000Bf"
 
 const ACCOUNT1_LABEL = "account1"
 const ACCOUNT1_ROOT_LABEL = `${ACCOUNT1_LABEL}.${tld}`

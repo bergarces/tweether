@@ -8,52 +8,52 @@ contract Tweether is Ownable {
   event TweethSent(
     address indexed _owner,
     uint256 indexed _nonce,
-    string _text,
+    string _message,
     address[] mentions
   );
 
   struct Tweeth {
     address owner;
     uint256 nonce;
-    string text;
+    string message;
     address[] mentions;
   }
 
-  uint256 public maxBytes;
+  uint256 public maxTweethBytes;
   uint256 public maxMentions;
 
   mapping(bytes32 => Tweeth) public tweeths;
   mapping(address => uint256) public nonceCounter;
 
-  constructor(uint256 _maxBytes, uint256 _maxMentions) public {
-    maxBytes = _maxBytes;
+  constructor(uint256 _maxTweethBytes, uint256 _maxMentions) public {
+    maxTweethBytes = _maxTweethBytes;
     maxMentions = _maxMentions;
   }
 
-  function setMaxBytes(uint256 _maxBytes) public onlyOwner {
-    maxBytes = _maxBytes;
+  function setMaxTweethBytes(uint256 _maxTweethBytes) public onlyOwner {
+    maxTweethBytes = _maxTweethBytes;
   }
 
   function setMaxMentions(uint256 _maxMentions) public onlyOwner {
     maxMentions = _maxMentions;
   }
 
-  function sendTweeth(string memory text, address[] memory mentions) public {
-    require(bytes(text).length <= maxBytes, "Maximum bytes exceeded");
-    require(mentions.length <= maxMentions, "Maximum mentions exceeded");
+  function sendTweeth(string memory _message, address[] memory _mentions) public {
+    require(bytes(_message).length <= maxTweethBytes, "Maximum byte length for tweeth exceeded");
+    require(_mentions.length <= maxMentions, "Maximum mentions exceeded");
 
     uint256 nonce = nonceCounter[msg.sender]++;
     Tweeth storage newTweeth = tweeths[keccak256(abi.encodePacked(msg.sender, nonce))];
 
     newTweeth.owner = msg.sender;
     newTweeth.nonce = nonce;
-    newTweeth.text = text;
-    newTweeth.mentions = mentions;
+    newTweeth.message = _message;
+    newTweeth.mentions = _mentions;
 
-    emit TweethSent(msg.sender, nonce, text, mentions);
+    emit TweethSent(msg.sender, nonce, _message, _mentions);
   }
 
-  function getTweeth(address owner, uint256 nonce) public view returns (Tweeth memory) {
-    return tweeths[keccak256(abi.encodePacked(owner, nonce))];
+  function getTweeth(address _owner, uint256 _nonce) public view returns (Tweeth memory) {
+    return tweeths[keccak256(abi.encodePacked(_owner, _nonce))];
   }
 }

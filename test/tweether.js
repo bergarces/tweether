@@ -9,29 +9,29 @@ contract("Tweether", accounts => {
     tweether = await Tweether.deployed()
   })
 
-  describe("maxBytes", () => {
-    const newMaxBytes = defaults.MAX_BYTES * 2
+  describe("maxTweethBytes", () => {
+    const newMaxTweethBytes = defaults.MAX_BYTES_TWEETH * 2
 
     after(async () => {
-      await tweether.setMaxBytes(defaults.MAX_BYTES, { from: accounts[0] })
+      await tweether.setMaxTweethBytes(defaults.MAX_BYTES_TWEETH, { from: accounts[0] })
     })
 
     it("should deploy with the default value", async () => {
-      const maxBytes = await tweether.maxBytes()
+      const maxTweethBytes = await tweether.maxTweethBytes()
 
-      assert.equal(maxBytes, defaults.MAX_BYTES, "MaxBytes default value not correct after deployment")
+      assert.equal(maxTweethBytes, defaults.MAX_BYTES_TWEETH, "MaxTweethBytes default value not correct after deployment")
     })
   
-    it("should be able to update MaxBytes value", async () => {
-      await tweether.setMaxBytes(newMaxBytes, { from: accounts[0] })
+    it("should be able to update MaxTweethBytes value", async () => {
+      await tweether.setMaxTweethBytes(newMaxTweethBytes, { from: accounts[0] })
   
-      const maxBytes = await tweether.maxBytes()
-      assert.equal(maxBytes, newMaxBytes, "MaxBytes value not correct after changing")
+      const maxTweethBytes = await tweether.maxTweethBytes()
+      assert.equal(maxTweethBytes, newMaxTweethBytes, "MaxTweethBytes value not correct after changing")
     })
   
-    it("should not be possible to update MaxBytes value with a non-owner account", async () => {
+    it("should not be possible to update MaxTweethBytes value with a non-owner account", async () => {
       await truffleAssert.fails(
-        tweether.setMaxBytes(newMaxBytes, { from: accounts[1] }),
+        tweether.setMaxTweethBytes(newMaxTweethBytes, { from: accounts[1] }),
         truffleAssert.ErrorType.REVERT
       )
     })
@@ -73,12 +73,12 @@ contract("Tweether", accounts => {
       const tweeth = await tweether.getTweeth(accounts[1], 0)
       assert.equal(tweeth.owner, accounts[1], "Wrong owner")
       assert.equal(tweeth.nonce, nonce, "Wrong nonce")
-      assert.equal(tweeth.text, "This is a Tweeth", "Wrong text")
+      assert.equal(tweeth.message, "This is a Tweeth", "Wrong message")
       assert.deepEqual(tweeth.mentions, [accounts[0], accounts[2]], "Wrong mentions")
     })
 
     it("should fail to send a tweeth over the maximum number of bytes", async () => {
-      const message = "x".repeat(defaults.MAX_BYTES + 1)
+      const message = "x".repeat(defaults.MAX_BYTES_TWEETH + 1)
 
       await truffleAssert.fails(
         tweether.sendTweeth(message, [], { from: accounts[1] }),
