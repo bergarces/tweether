@@ -9,6 +9,7 @@ import Row from 'react-bootstrap/Row'
 import Web3ProviderContext from '../contexts/Web3ProviderContext'
 import TweetherArtifact from '../contracts/Tweether.json'
 import TweetherIdentityArtifact from '../contracts/TweetherIdentity.json'
+import ENSRegistryArtifact from '../contracts/ENSRegistry.json'
 
 import IdentityModal from './IdentityModal'
 import SendTweethModal from './SendTweethModal'
@@ -17,7 +18,7 @@ import SearchTweeths from './SearchTweeths'
 function Dapp() {
   const [showSendModal, setShowSendModal] = useState(false)
   const [showProfileModal, setShowProfileModal] = useState(false)
-  const [displayOwnTweeths, setDisplayOwnTweeths] = useState(false)
+  const [displayOwnTweeths, setDisplayOwnTweeths] = useState(true)
 
   const [web3Provider, setWeb3Provider] = useState(undefined)
   const [account, setAccount] = useState(undefined)
@@ -52,15 +53,17 @@ function Dapp() {
       setTweetherIdentityContract(tweetherIdentityContract)
       setAccount(account)
 
-      web3Provider.eth.ens.registryAddress =
-        '0x0D3813917F0374B1644083bAd4ea844CFB6cAac5'
-      const account1 = await web3Provider.eth.ens.getAddress('account1.test')
-      const account2 = await web3Provider.eth.ens.getAddress('account2.test')
-      const tweether = await web3Provider.eth.ens.getAddress('tweether.test')
-      const profile = await web3Provider.eth.ens.getAddress(
-        'profile.tweether.test'
-      )
-      console.log('ENS TEST', { account1, account2, tweether, profile })
+      if (networkId === 777) {
+        web3Provider.eth.ens.registryAddress = ENSRegistryArtifact.networks[networkId].address
+      
+        const account1 = await web3Provider.eth.ens.getAddress('account1.test')
+        const account2 = await web3Provider.eth.ens.getAddress('account2.test')
+        const tweether = await web3Provider.eth.ens.getAddress('tweether.test')
+        const profile = await web3Provider.eth.ens.getAddress(
+          'profile.tweether.test'
+        )
+        console.log('ENS TEST', { account1, account2, tweether, profile })
+      }
     }
 
     init()
