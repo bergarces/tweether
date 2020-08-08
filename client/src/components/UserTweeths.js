@@ -6,32 +6,39 @@ import Web3ProviderContext from '../contexts/Web3ProviderContext'
 
 import Tweeth from './Tweeth'
 
-function UserTweeths({ address, maxTweeths }) {
-  const { web3Provider, contract } = useContext(Web3ProviderContext)
+function UserTweeths({ address, name, maxTweeths }) {
+  const { web3Provider, tweetherContract } = useContext(Web3ProviderContext)
   const [tweethNonces, setTweethNonces] = useState([])
 
   useEffect(() => {
     const init = async () => {
-      if (contract && address) {
-        contract.events.TweethSent({
-          fromBlock: await web3Provider.eth.getBlockNumber() + 1,
-          filter: { address: address }
-        })
-        .on('data', () => { fetchTweeths(contract, address, maxTweeths, setTweethNonces) })
-        .on('changed', (event) => { console.log('Changed event. Needs reviewing.', event) })
-        .on('error', console.error)
+      if (tweetherContract && address) {
+        tweetherContract.events
+          .TweethSent({
+            fromBlock: (await web3Provider.eth.getBlockNumber()) + 1,
+            filter: { address },
+          })
+          .on('data', () => {
+            fetchTweeths(tweetherContract, address, maxTweeths, setTweethNonces)
+          })
+          .on('error', console.error)
 
-        fetchTweeths(contract, address, maxTweeths, setTweethNonces)
+        fetchTweeths(tweetherContract, address, maxTweeths, setTweethNonces)
       }
     }
 
     init()
-  }, [web3Provider, contract, address, maxTweeths])
+  }, [web3Provider, tweetherContract, address, name, maxTweeths])
 
   return (
     <ListGroup>
       {tweethNonces.map((nonce) => (
-        <Tweeth key={nonce.toString()} address={address} nonce={nonce} />
+        <Tweeth
+          key={nonce.toString()}
+          address={address}
+          name={name}
+          nonce={nonce}
+        />
       ))}
     </ListGroup>
   )

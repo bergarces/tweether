@@ -5,16 +5,14 @@ import ListGroup from 'react-bootstrap/ListGroup'
 
 import Web3ProviderContext from '../contexts/Web3ProviderContext'
 
-function Tweeth(props) {
-  const { contract } = useContext(Web3ProviderContext)
+function Tweeth({ address, name, nonce }) {
+  const { tweetherContract } = useContext(Web3ProviderContext)
   const [tweeth, setTweeth] = useState(undefined)
-
-  const { address, nonce } = props
 
   useEffect(() => {
     const init = async () => {
-      if (contract && address) {
-        const fetchedTweeth = await contract.methods
+      if (tweetherContract && address) {
+        const fetchedTweeth = await tweetherContract.methods
           .getTweeth(address, nonce)
           .call()
 
@@ -23,14 +21,14 @@ function Tweeth(props) {
     }
 
     init()
-  }, [contract, address, nonce])
+  }, [tweetherContract, address, name, nonce])
 
   return (
     <ListGroup.Item>
       <Card>
         <Card.Body>
-          <Card.Title>{tweeth?.owner}</Card.Title>
-          <Card.Text>{tweeth?.text}</Card.Text>
+          <Card.Title>{name || address}</Card.Title>
+          <Card.Text>{tweeth?.message}</Card.Text>
         </Card.Body>
       </Card>
     </ListGroup.Item>

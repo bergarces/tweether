@@ -3,6 +3,7 @@ const FIFSRegistrar = artifacts.require("@ensdomains/ens/FIFSRegistrar");
 const ReverseRegistrar = artifacts.require("@ensdomains/ens/ReverseRegistrar");
 const PublicResolver = artifacts.require("@ensdomains/resolver/PublicResolver");
 const Tweether = artifacts.require("Tweether");
+const TweetherIdentity = artifacts.require("TweetherIdentity");
 
 const utils = require('web3-utils');
 const namehash = require('eth-ens-namehash');
@@ -12,6 +13,10 @@ const tld = "test";
 const TWEETHER_LABEL = "tweether"
 const TWEETHER_ROOT_LABEL = `${TWEETHER_LABEL}.${tld}`
 const TWEETHER_NODE = namehash.hash(TWEETHER_ROOT_LABEL)
+
+const PROFILE_LABEL = "profile"
+const PROFILE_ROOT_LABEL = `${PROFILE_LABEL}.${TWEETHER_LABEL}.${tld}`
+const PROFILE_NODE = namehash.hash(PROFILE_ROOT_LABEL)
 
 const ACCOUNT1_LABEL = "account1"
 const ACCOUNT1_ROOT_LABEL = `${ACCOUNT1_LABEL}.${tld}`
@@ -81,8 +86,8 @@ async function setupReverseRegistrar(ens, resolver, reverseRegistrar, accounts) 
 
 async function setupAddresses(registrar, resolver, ens, accounts) {
   const tweether = await Tweether.deployed()
+  const profile = await TweetherIdentity.deployed()
 
-  console.log({ accounts, tweether: tweether.address })
   await registrar.register(utils.sha3(ACCOUNT1_LABEL), accounts[0])
   await ens.setResolver(ACCOUNT1_NODE, resolver.address)
   await resolver.setAddr(ACCOUNT1_NODE, accounts[0])
@@ -94,4 +99,8 @@ async function setupAddresses(registrar, resolver, ens, accounts) {
   await registrar.register(utils.sha3(TWEETHER_LABEL), accounts[0])
   await ens.setResolver(TWEETHER_NODE, resolver.address)
   await resolver.setAddr(TWEETHER_NODE, tweether.address)
+
+  await ens.setSubnodeOwner(TWEETHER_NODE, utils.sha3(PROFILE_LABEL), accounts[0]);
+  await ens.setResolver(PROFILE_NODE, resolver.address)
+  await resolver.setAddr(PROFILE_NODE, profile.address)
 }

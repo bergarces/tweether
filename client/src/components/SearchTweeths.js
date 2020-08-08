@@ -8,13 +8,14 @@ import Web3ProviderContext from '../contexts/Web3ProviderContext'
 
 import UserTweeths from './UserTweeths'
 
-function SearchTweeths({ account, maxTweeths }) {
-  const { web3Provider } = useContext(Web3ProviderContext)
-  const [searchQuery, setSearchQuery] = useState(account)
+function SearchTweeths({ maxTweeths }) {
+  const { web3Provider, account } = useContext(Web3ProviderContext)
+  const [address, setAddress] = useState(account)
+  const [name, setName] = useState(undefined)
   const { register, handleSubmit } = useForm()
 
   React.useEffect(() => {
-    setSearchQuery(account)
+    setAddress(account)
   }, [account])
 
   const onSubmit = async (formData) => {
@@ -23,20 +24,21 @@ function SearchTweeths({ account, maxTweeths }) {
 
     if (ensRegEx.test(formData.searchQuery)) {
       try {
-        const account = await web3Provider.eth.ens.getAddress(formData.searchQuery)
-        console.log(account)
-        setSearchQuery(account)
+        const addressFromEns = await web3Provider.eth.ens.getAddress(
+          formData.searchQuery
+        )
+        setAddress(addressFromEns)
+        setName(formData.searchQuery)
       } catch (error) {
-        console.log('Name cannot be resolved')
-        setSearchQuery("0x0000000000000000000000000000000000000000")
+        setAddress('0x0000000000000000000000000000000000000000')
+        setName(undefined)
       }
-    }
-    else if (addressRegEx.test(formData.searchQuery)) {
-      setSearchQuery(formData.searchQuery)
-    }
-    else {
-      console.log('NO MATCH')
-      setSearchQuery("0x0000000000000000000000000000000000000000")
+    } else if (addressRegEx.test(formData.searchQuery)) {
+      setAddress(formData.searchQuery)
+      setName(undefined)
+    } else {
+      setAddress('0x0000000000000000000000000000000000000000')
+      setName(undefined)
     }
   }
 
@@ -58,10 +60,8 @@ function SearchTweeths({ account, maxTweeths }) {
           Search
         </Button>
       </form>
-      <Alert variant="primary">
-        Searching tweeths for {searchQuery}
-      </Alert>
-      <UserTweeths address={searchQuery} maxTweeths={maxTweeths} />
+      <Alert variant="primary">Searching tweeths for {name || address}</Alert>
+      <UserTweeths address={address} name={name} maxTweeths={maxTweeths} />
     </>
   )
 }

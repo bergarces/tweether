@@ -7,15 +7,17 @@ import Modal from 'react-bootstrap/Modal'
 import Web3ProviderContext from '../contexts/Web3ProviderContext'
 
 function SendTweethModal({ show, handleClose }) {
-  const { account, contract } = useContext(Web3ProviderContext)
+  const { account, tweetherContract } = useContext(Web3ProviderContext)
   const { register, handleSubmit, errors } = useForm()
 
   const onSubmit = async (formData) => {
-    contract.methods.sendTweeth(formData.text, []).send({ from: account })
+    tweetherContract.methods
+      .sendTweeth(formData.message, [])
+      .send({ from: account })
     handleClose()
   }
 
-  const isValidSize = (text) => new Blob([text]).size < 280
+  const isValidSize = (message) => new Blob([message]).size < 280
 
   return (
     <Modal show={show} onHide={handleClose}>
@@ -25,15 +27,15 @@ function SendTweethModal({ show, handleClose }) {
         </Modal.Header>
         <Modal.Body>
           <textarea
-            name="text"
+            name="message"
             rows="4"
             cols="50"
             ref={register({ required: true, validate: isValidSize })}
           />
-          {errors.text?.type === 'required' && (
+          {errors.message?.type === 'required' && (
             <span>This field is required</span>
           )}
-          {errors.text?.type === 'validate' && (
+          {errors.message?.type === 'validate' && (
             <span>Length of the field exceeds 280 bytes</span>
           )}
         </Modal.Body>

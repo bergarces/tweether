@@ -7,18 +7,22 @@ import Row from 'react-bootstrap/Row'
 
 import Web3ProviderContext from '../contexts/Web3ProviderContext'
 import TweetherArtifact from '../contracts/Tweether.json'
+import TweetherIdentityArtifact from '../contracts/TweetherIdentity.json'
 
+import IdentityModal from './IdentityModal'
 import SendTweethModal from './SendTweethModal'
 import SearchTweeths from './SearchTweeths'
 
 function Dapp() {
-  const [show, setShow] = useState(false)
-  const handleClose = () => setShow(false)
-  const handleShow = () => setShow(true)
+  const [showSendModal, setShowSendModal] = useState(false)
+  const [showProfileModal, setShowProfileModal] = useState(false)
 
   const [web3Provider, setWeb3Provider] = useState(undefined)
   const [account, setAccount] = useState(undefined)
-  const [contract, setContract] = useState(undefined)
+  const [tweetherContract, setTweetherContract] = useState(undefined)
+  const [tweetherIdentityContract, setTweetherIdentityContract] = useState(
+    undefined
+  )
 
   useEffect(() => {
     const init = async () => {
@@ -28,44 +32,75 @@ function Dapp() {
       const account = accounts[0]
 
       const networkId = await web3Provider.eth.net.getId()
-      const contractAddress = TweetherArtifact.networks[networkId].address
-      const contract = new web3Provider.eth.Contract(
+      const tweetherAddress = TweetherArtifact.networks[networkId].address
+      const tweetherContract = new web3Provider.eth.Contract(
         TweetherArtifact.abi,
-        contractAddress,
-        {
-          from: account,
-        }
+        tweetherAddress
       )
 
+      const tweetherIdentityAddress =
+        TweetherIdentityArtifact.networks[networkId].address
+      const tweetherIdentityContract = new web3Provider.eth.Contract(
+        TweetherIdentityArtifact.abi,
+        tweetherIdentityAddress
+      )
+
+      console.log({ tweetherContract, tweetherIdentityContract })
+
       setWeb3Provider(web3Provider)
-      setContract(contract)
+      setTweetherContract(tweetherContract)
+      setTweetherIdentityContract(tweetherIdentityContract)
       setAccount(account)
 
-      web3Provider.eth.ens.registryAddress = '0xD05eb4322Be68A45a5F82Bc69E552047c51078b4'
+      web3Provider.eth.ens.registryAddress =
+        '0x0D3813917F0374B1644083bAd4ea844CFB6cAac5'
       const account1 = await web3Provider.eth.ens.getAddress('account1.test')
       const tweether = await web3Provider.eth.ens.getAddress('tweether.test')
-      console.log({account1, tweether})
+      const profile = await web3Provider.eth.ens.getAddress(
+        'profile.tweether.test'
+      )
+      console.log('ENS TEST', { account1, tweether, profile })
     }
 
     init()
   }, [])
 
   return (
-    <Web3ProviderContext.Provider value={{ web3Provider, account, contract }}>
+    <Web3ProviderContext.Provider
+      value={{
+        web3Provider,
+        account,
+        tweetherContract,
+        tweetherIdentityContract,
+      }}
+    >
       <Row className="justify-content-md-center mb-4">
         <Col md="auto">
-          <Button variant="primary" onClick={handleShow}>
+          <Button variant="primary" onClick={() => setShowSendModal(true)}>
             Send a Tweeth!
+          </Button>
+        </Col>
+        <Col md="auto">
+          <Button variant="primary" onClick={() => setShowProfileModal(true)}>
+            Your Profile
           </Button>
         </Col>
       </Row>
       <Row className="justify-content-md-center mb-4">
         <Col md="auto">
-          <SearchTweeths account={account} maxTweeths={10} />
+          <SearchTweeths maxTweeths={10} />
         </Col>
       </Row>
 
-      <SendTweethModal show={show} handleClose={handleClose} />
+      <SendTweethModal
+        show={showSendModal}
+        handleClose={() => setShowSendModal(false)}
+      />
+      <IdentityModal
+        address={account}
+        show={showProfileModal}
+        handleClose={() => setShowProfileModal(false)}
+      />
     </Web3ProviderContext.Provider>
   )
 }
