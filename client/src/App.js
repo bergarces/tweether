@@ -29,7 +29,7 @@ function App() {
       }
     }
     init()
-  }, [window.ethereum])
+  })
 
   const enableEthereum = async () => {
     await window.ethereum.request({ method: 'eth_requestAccounts' })
