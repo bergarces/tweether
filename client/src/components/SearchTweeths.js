@@ -22,7 +22,7 @@ function SearchTweeths({
     if (displayOwnTweeths) {
       setAddress(account)
       setName(undefined)
-      document.getElementById("search-form").reset()
+      document.getElementById('search-form').reset()
     }
   }, [displayOwnTweeths, account])
 
