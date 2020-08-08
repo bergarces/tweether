@@ -7,11 +7,15 @@ import Modal from 'react-bootstrap/Modal'
 import Web3ProviderContext from '../contexts/Web3ProviderContext'
 
 function IdentityModal({ address, show, handleClose }) {
-  const { web3Provider, tweetherIdentityContract } = useContext(Web3ProviderContext)
+  const { web3Provider, tweetherIdentityContract, account } = useContext(
+    Web3ProviderContext
+  )
   const { register, handleSubmit, errors } = useForm()
   const [bio, setBio] = useState(undefined)
   const [edit, setEdit] = useState(false)
   const [waitingForTx, setWaitingForTx] = useState(false)
+
+  const canEdit = address === account
 
   const onSubmit = async (formData) => {
     await tweetherIdentityContract.methods
@@ -44,7 +48,7 @@ function IdentityModal({ address, show, handleClose }) {
       }
     }
     init()
-  }, [address])
+  }, [web3Provider, tweetherIdentityContract, address])
 
   const setEditor = (e) => {
     e.preventDefault()
@@ -76,20 +80,23 @@ function IdentityModal({ address, show, handleClose }) {
                 <span>Length of the field exceeds 280 bytes</span>
               )}
             </>
+          ) : waitingForTx ? (
+            'Waiting for bio to be updated'
           ) : (
-            waitingForTx ? 'Waiting for bio to be updated' : bio
+            bio
           )}
         </Modal.Body>
         <Modal.Footer>
-          {edit ? (
-            <Button variant="primary" type="submit">
-              Save Changes
-            </Button>
-          ) : (
-            <Button variant="primary" onClick={setEditor}>
-              Edit
-            </Button>
-          )}
+          {canEdit &&
+            (edit ? (
+              <Button variant="primary" type="submit">
+                Save Changes
+              </Button>
+            ) : (
+              <Button variant="primary" onClick={setEditor}>
+                Edit
+              </Button>
+            ))}
 
           <Button variant="primary" onClick={handleClose}>
             Close

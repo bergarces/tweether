@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import * as Web3 from 'web3'
 
+import Alert from 'react-bootstrap/Alert'
 import Button from 'react-bootstrap/Button'
 import Col from 'react-bootstrap/Col'
 import Row from 'react-bootstrap/Row'
@@ -16,6 +17,7 @@ import SearchTweeths from './SearchTweeths'
 function Dapp() {
   const [showSendModal, setShowSendModal] = useState(false)
   const [showProfileModal, setShowProfileModal] = useState(false)
+  const [displayOwnTweeths, setDisplayOwnTweeths] = useState(false)
 
   const [web3Provider, setWeb3Provider] = useState(undefined)
   const [account, setAccount] = useState(undefined)
@@ -45,8 +47,6 @@ function Dapp() {
         tweetherIdentityAddress
       )
 
-      console.log({ tweetherContract, tweetherIdentityContract })
-
       setWeb3Provider(web3Provider)
       setTweetherContract(tweetherContract)
       setTweetherIdentityContract(tweetherIdentityContract)
@@ -55,11 +55,12 @@ function Dapp() {
       web3Provider.eth.ens.registryAddress =
         '0x0D3813917F0374B1644083bAd4ea844CFB6cAac5'
       const account1 = await web3Provider.eth.ens.getAddress('account1.test')
+      const account2 = await web3Provider.eth.ens.getAddress('account2.test')
       const tweether = await web3Provider.eth.ens.getAddress('tweether.test')
       const profile = await web3Provider.eth.ens.getAddress(
         'profile.tweether.test'
       )
-      console.log('ENS TEST', { account1, tweether, profile })
+      console.log('ENS TEST', { account1, account2, tweether, profile })
     }
 
     init()
@@ -76,19 +77,33 @@ function Dapp() {
     >
       <Row className="justify-content-md-center mb-4">
         <Col md="auto">
+          <Alert variant="info">Connected from account {account}</Alert>
+        </Col>
+      </Row>
+      <Row className="justify-content-md-center mb-4">
+        <Col md="auto">
           <Button variant="primary" onClick={() => setShowSendModal(true)}>
-            Send a Tweeth!
+            Send a Tweeth
+          </Button>
+        </Col>
+        <Col md="auto">
+          <Button variant="primary" onClick={() => setDisplayOwnTweeths(true)}>
+            My Tweeths
           </Button>
         </Col>
         <Col md="auto">
           <Button variant="primary" onClick={() => setShowProfileModal(true)}>
-            Your Profile
+            My Profile
           </Button>
         </Col>
       </Row>
       <Row className="justify-content-md-center mb-4">
         <Col md="auto">
-          <SearchTweeths maxTweeths={10} />
+          <SearchTweeths
+            displayOwnTweeths={displayOwnTweeths}
+            cancelDisplayOwnTweeths={() => setDisplayOwnTweeths(false)}
+            maxTweeths={10}
+          />
         </Col>
       </Row>
 
