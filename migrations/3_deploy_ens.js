@@ -8,7 +8,7 @@ const TweetherIdentity = artifacts.require("TweetherIdentity");
 const utils = require('web3-utils');
 const namehash = require('eth-ens-namehash');
 
-const tld = "test";
+const tld = "eth";
 
 const TWEETHER_LABEL = "tweether"
 const TWEETHER_ROOT_LABEL = `${TWEETHER_LABEL}.${tld}`

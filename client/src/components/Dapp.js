@@ -40,23 +40,23 @@ function Dapp() {
         web3Provider.eth.ens.registryAddress =
           ENSRegistryArtifact.networks[networkId].address
 
-        const account1 = await web3Provider.eth.ens.getAddress('account1.test')
-        const account2 = await web3Provider.eth.ens.getAddress('account2.test')
-        const tweether = await web3Provider.eth.ens.getAddress('tweether.test')
+        const account1 = await web3Provider.eth.ens.getAddress('account1.eth')
+        const account2 = await web3Provider.eth.ens.getAddress('account2.eth')
+        const tweether = await web3Provider.eth.ens.getAddress('tweether.eth')
         const profile = await web3Provider.eth.ens.getAddress(
-          'profile.tweether.test'
+          'profile.tweether.eth'
         )
         console.log('ENS TEST', { account1, account2, tweether, profile })
       }
 
-      const tweetherProxyAddress = await web3Provider.eth.ens.getAddress('tweether.test')
+      const tweetherProxyAddress = await web3Provider.eth.ens.getAddress('tweether.eth')
       const tweetherContract = new web3Provider.eth.Contract(
         TweetherArtifact.abi,
         tweetherProxyAddress
       )
 
       const tweetherIdentityAddress = await web3Provider.eth.ens.getAddress(
-        'profile.tweether.test'
+        'profile.tweether.eth'
       )
       const tweetherIdentityContract = new web3Provider.eth.Contract(
         TweetherIdentityArtifact.abi,

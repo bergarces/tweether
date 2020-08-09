@@ -48,7 +48,7 @@ Each of these accounts should have a high amount of ether.
 
 # ENS Names
 The following domain names are set up during migration if the Chain Id is set to 777.
- - `tweether.test` for the main contract.
- - `identity.tweether.test` for the contract that keeps the user profile.
- - `account1.test` for the first imported account.
- - `account2.test` for the second imported account.
+ - `tweether.eth` for the main contract.
+ - `identity.tweether.eth` for the contract that keeps the user profile.
+ - `account1.eth` for the first imported account.
+ - `account2.eth` for the second imported account.
