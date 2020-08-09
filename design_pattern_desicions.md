@@ -2,8 +2,12 @@
 
 ## Circuit Breaker
 
-TODO
+As per project requirements, a circuit breaker has been added on the Tweether contract that prevents users from submitting new tweeths. This could be useful to pause the contract activity if a bug is found or whilst the contract is being upgraded. However, I would be reluctant to add such a mechanism on a final version of the product, as the idea behind this service is to be censorship resistant.
 
 ## Upgradable Contract
 
-TODO
+The Tweether contract has been deployed with an upgradable proxy. This way, if any new features such as additional Tweeth fields are added to the contract, e.g. mentions, hashtags or to create threads, it should be possible to upgrade the contract and keep the existing data intact.
+
+The tweeth data stays in the proxy contract, which just delegates the execution of the calls to the delegate contract. The delegate contract can be changed as long as the storage layout is compatible with the previous one.
+
+It is possible to implement upgradable contracts using the openzeppelin framework, but for this case a simple assembly contract with a fallback method and a method to update the delegate has been used.
