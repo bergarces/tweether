@@ -29,6 +29,7 @@ function Dapp() {
 
   useEffect(() => {
     const init = async () => {
+      window.ethereum.autoRefreshOnNetworkChange = false;
       const web3Provider = new Web3(window.ethereum)
 
       const accounts = await web3Provider.eth.getAccounts()
