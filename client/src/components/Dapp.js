@@ -44,7 +44,7 @@ function Dapp() {
         const account2 = await web3Provider.eth.ens.getAddress('account2.eth')
         const tweether = await web3Provider.eth.ens.getAddress('tweether.eth')
         const profile = await web3Provider.eth.ens.getAddress(
-          'profile.tweether.eth'
+          'identity.tweether.eth'
         )
         console.log('ENS TEST', { account1, account2, tweether, profile })
       }
@@ -58,7 +58,7 @@ function Dapp() {
       )
 
       const tweetherIdentityAddress = await web3Provider.eth.ens.getAddress(
-        'profile.tweether.eth'
+        'identity.tweether.eth'
       )
       const tweetherIdentityContract = new web3Provider.eth.Contract(
         TweetherIdentityArtifact.abi,

@@ -1,4 +1,4 @@
 
 Testnet used: Rinkeby
-Tweether: 
-TweetherIdentity: 
+Tweether: 0xD02DB954fe61E895f3C031C21531c766DC5883bd
+TweetherIdentity: 0x5E741DDBB786447aB196e1E1BB1c52DfF15Eacb2
