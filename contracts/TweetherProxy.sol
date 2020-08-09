@@ -9,6 +9,9 @@ contract TweetherProxy {
   address internal delegate;
   address owner = msg.sender;
 
+  /** @dev Update delegate contract
+    * @param newDelegateAddress New address for the delegate contract
+    */
   function upgradeDelegate(address newDelegateAddress) public {
     require(msg.sender == owner);
     delegate = newDelegateAddress;
