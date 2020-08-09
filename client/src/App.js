@@ -21,7 +21,9 @@ function App() {
       setWeb3Defined(defined)
 
       if (defined) {
-        const accounts = await window.ethereum.request({ method: 'eth_accounts' })
+        const accounts = await window.ethereum.request({
+          method: 'eth_accounts',
+        })
         setWeb3Enabled(accounts.length > 0)
 
         window.ethereum.on('chainChanged', () => window.location.reload())

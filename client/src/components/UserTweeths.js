@@ -6,45 +6,92 @@ import Web3ProviderContext from '../contexts/Web3ProviderContext'
 
 import Tweeth from './Tweeth'
 
-function UserTweeths({ address, name, maxTweeths }) {
+function UserTweeths({
+  address,
+  name,
+  repliesTo,
+  setAddress,
+  setName,
+  setRepliesTo,
+  cancelDisplayOwnTweeths,
+  maxTweeths,
+}) {
   const { web3Provider, tweetherContract } = useContext(Web3ProviderContext)
-  const [tweethNonces, setTweethNonces] = useState([])
+  const [tweeths, setTweeths] = useState([])
+  const [subscription, setSubscription] = useState(undefined)
 
   useEffect(() => {
     const init = async () => {
-      if (tweetherContract && address) {
-        tweetherContract.events
+      if (!tweetherContract) {
+        return
+      }
+
+      if (subscription) {
+        subscription.unsubscribe()
+      }
+      setTweeths([])
+
+      if (address) {
+        const subscription = tweetherContract.events
           .TweethSent({
             fromBlock: (await web3Provider.eth.getBlockNumber()) + 1,
-            filter: { address },
+            filter: { _sender: address },
           })
           .on('data', () => {
-            fetchTweeths(tweetherContract, address, maxTweeths, setTweethNonces)
+            fetchTweethsByAddress(
+              tweetherContract,
+              address,
+              maxTweeths,
+              setTweeths
+            )
           })
           .on('error', console.error)
+        setSubscription(subscription)
 
-        fetchTweeths(tweetherContract, address, maxTweeths, setTweethNonces)
+        fetchTweethsByAddress(tweetherContract, address, maxTweeths, setTweeths)
+      } else if (repliesTo) {
+        const subscription = tweetherContract.events
+          .TweethSent({
+            fromBlock: (await web3Provider.eth.getBlockNumber()) + 1,
+            filter: { _replyTo: repliesTo },
+          })
+          .on('data', (event) => {
+            fetchTweethsByThread(tweetherContract, repliesTo, setTweeths)
+          })
+          .on('error', console.error)
+        setSubscription(subscription)
+
+        fetchTweethsByThread(tweetherContract, repliesTo, setTweeths)
       }
     }
 
     init()
-  }, [web3Provider, tweetherContract, address, name, maxTweeths])
+  }, [web3Provider, tweetherContract, address, name, repliesTo, maxTweeths])
 
   return (
     <ListGroup>
-      {tweethNonces.map((nonce) => (
+      {tweeths.map((tweeth, idx) => (
         <Tweeth
-          key={nonce.toString()}
-          address={address}
+          key={idx}
+          address={tweeth.address}
           name={name}
-          nonce={nonce}
+          nonce={tweeth.nonce}
+          setAddress={setAddress}
+          setName={setName}
+          setRepliesTo={setRepliesTo}
+          cancelDisplayOwnTweeths={cancelDisplayOwnTweeths}
         />
       ))}
     </ListGroup>
   )
 }
 
-async function fetchTweeths(contract, address, maxTweeths, setTweethNonces) {
+async function fetchTweethsByAddress(
+  contract,
+  address,
+  maxTweeths,
+  setTweeths
+) {
   const userNonce = await contract.methods.nonceCounter(address).call()
 
   const firstNonce = Math.max(userNonce - maxTweeths, 0)
@@ -55,7 +102,32 @@ async function fetchTweeths(contract, address, maxTweeths, setTweethNonces) {
     (v, k) => k + firstNonce
   )
 
-  setTweethNonces(tweethNonces.reverse())
+  const temp = tweethNonces.reverse().map((nonce) => {
+    return { address, nonce }
+  })
+  setTweeths(temp)
+}
+
+async function fetchTweethsByThread(contract, repliesTo, setTweeths) {
+  const mainTweeth = await contract.methods.tweeths(repliesTo).call()
+
+  const replyEvents = await contract.getPastEvents('TweethSent', {
+    filter: { _replyTo: repliesTo },
+    fromBlock: 0,
+    toBlock: 'latest',
+  })
+
+  const replies = replyEvents.map((reply) => {
+    return {
+      address: reply.returnValues._sender,
+      nonce: reply.returnValues._nonce,
+    }
+  })
+
+  setTweeths([
+    { address: mainTweeth.sender, nonce: mainTweeth.nonce },
+    ...replies,
+  ])
 }
 
 export default UserTweeths

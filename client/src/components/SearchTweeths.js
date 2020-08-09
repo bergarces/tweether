@@ -14,8 +14,11 @@ function SearchTweeths({
   maxTweeths,
 }) {
   const { web3Provider, account } = useContext(Web3ProviderContext)
-  const [address, setAddress] = useState(undefined)
+  const [address, setAddress] = useState(
+    '0x0000000000000000000000000000000000000000'
+  )
   const [name, setName] = useState(undefined)
+  const [repliesTo, setRepliesTo] = useState(undefined)
   const { register, handleSubmit } = useForm()
 
   React.useEffect(() => {
@@ -29,27 +32,33 @@ function SearchTweeths({
   const onSubmit = async (formData) => {
     const ensRegEx = /^.*\.(test|eth)$/
     const addressRegEx = /^0x[0-9a-fA-F]{40}$/
+    const hashRegEx = /^0x[0-9a-fA-F]{64}$/
 
     if (ensRegEx.test(formData.searchQuery)) {
-      console.log('NAME SEARCH')
       try {
         const addressFromEns = await web3Provider.eth.ens.getAddress(
           formData.searchQuery
         )
         setAddress(addressFromEns)
         setName(formData.searchQuery)
+        setRepliesTo(undefined)
       } catch (error) {
         setAddress('0x0000000000000000000000000000000000000000')
         setName(undefined)
+        setRepliesTo(undefined)
       }
     } else if (addressRegEx.test(formData.searchQuery)) {
-      console.log('ADDRESS SEARCH')
       setAddress(formData.searchQuery)
       setName(undefined)
+      setRepliesTo(undefined)
+    } else if (hashRegEx.test(formData.searchQuery)) {
+      setAddress(undefined)
+      setName(undefined)
+      setRepliesTo(formData.searchQuery)
     } else {
-      console.log('BAD SEARCH')
       setAddress('0x0000000000000000000000000000000000000000')
       setName(undefined)
+      setRepliesTo(undefined)
     }
 
     cancelDisplayOwnTweeths()
@@ -65,7 +74,7 @@ function SearchTweeths({
         <input
           type="text"
           name="searchQuery"
-          placeholder="Search by sender"
+          placeholder="Search by sender or tweeth hash"
           ref={register({ required: true })}
           className="mr-1"
           style={{ width: '500px' }}
@@ -77,7 +86,21 @@ function SearchTweeths({
       {!displayOwnTweeths && address && (
         <Alert variant="primary">Searching tweeths for {name || address}</Alert>
       )}
-      <UserTweeths address={address} name={name} maxTweeths={maxTweeths} />
+      {!displayOwnTweeths && repliesTo && (
+        <Alert variant="primary">
+          Searching replies for tweeth {repliesTo}
+        </Alert>
+      )}
+      <UserTweeths
+        address={address}
+        name={name}
+        repliesTo={repliesTo}
+        setAddress={setAddress}
+        setName={setName}
+        setRepliesTo={setRepliesTo}
+        cancelDisplayOwnTweeths={cancelDisplayOwnTweeths}
+        maxTweeths={maxTweeths}
+      />
     </>
   )
 }

@@ -54,8 +54,9 @@ function Dapp() {
       setAccount(account)
 
       if (networkId === 777) {
-        web3Provider.eth.ens.registryAddress = ENSRegistryArtifact.networks[networkId].address
-      
+        web3Provider.eth.ens.registryAddress =
+          ENSRegistryArtifact.networks[networkId].address
+
         const account1 = await web3Provider.eth.ens.getAddress('account1.test')
         const account2 = await web3Provider.eth.ens.getAddress('account2.test')
         const tweether = await web3Provider.eth.ens.getAddress('tweether.test')

@@ -49,6 +49,7 @@ contract("Tweether", accounts => {
       assert.equal(tweeth.nonce, nonce, "Wrong nonce")
       assert.equal(tweeth.replyTo, bytes32Zero, "Wrong reply hash")
       assert.equal(tweeth.message, "This is a Tweeth", "Wrong message")
+      assert.isOk(tweeth.timestamp, "No timestamp")
     })
 
     it("should be possible to reply to an existing tweeth", async () => {
@@ -61,6 +62,7 @@ contract("Tweether", accounts => {
       assert.equal(tweeth.nonce, nonce, "Wrong nonce")
       assert.equal(tweeth.replyTo, tweethHash, "Wrong reply hash")
       assert.equal(tweeth.message, "This is a reply to a Tweeth", "Wrong message")
+      assert.isOk(tweeth.timestamp, "No timestamp")
     })
 
     it("should fail to send a tweeth over the maximum number of bytes", async () => {

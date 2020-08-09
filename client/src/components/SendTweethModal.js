@@ -6,13 +6,16 @@ import Modal from 'react-bootstrap/Modal'
 
 import Web3ProviderContext from '../contexts/Web3ProviderContext'
 
-function SendTweethModal({ show, handleClose }) {
+const bytes32Zero =
+  '0x0000000000000000000000000000000000000000000000000000000000000000'
+
+function SendTweethModal({ replyTo, show, handleClose }) {
   const { account, tweetherContract } = useContext(Web3ProviderContext)
   const { register, handleSubmit, errors } = useForm()
 
   const onSubmit = async (formData) => {
     tweetherContract.methods
-      .sendTweeth(formData.message, [])
+      .sendTweeth(formData.message, replyTo ? replyTo : bytes32Zero)
       .send({ from: account })
     handleClose()
   }
@@ -26,6 +29,7 @@ function SendTweethModal({ show, handleClose }) {
           <Modal.Title>Send Tweeth</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          {replyTo ? 'REPLYING' : 'NOT REPLYING'}
           <textarea
             name="message"
             rows="4"

@@ -18,6 +18,7 @@ contract Tweether is Ownable {
     uint256 nonce;
     bytes32 replyTo;
     string message;
+    uint256 timestamp;
   }
 
   uint256 public maxTweethBytes;
@@ -52,6 +53,7 @@ contract Tweether is Ownable {
     newTweeth.nonce = nonce;
     newTweeth.replyTo = _replyTo;
     newTweeth.message = _message;
+    newTweeth.timestamp = block.timestamp;
 
     emit TweethSent(msg.sender, nonce, _replyTo, _message);
   }
