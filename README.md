@@ -52,3 +52,12 @@ The following domain names are set up during migration if the Chain Id is set to
  - `identity.tweether.eth` for the contract that keeps the user profile.
  - `account1.eth` for the first imported account.
  - `account2.eth` for the second imported account.
+
+# TODO
+ - Add reverse name resolution.
+ - Select numbers of tweeths to display and add pagination.
+ - Add support for avatars.
+ - Add support for threads.
+ - Add support for mentions.
+ - Add support for hashtags.
+ - Review UI/UX.
