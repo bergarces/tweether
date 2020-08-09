@@ -7,34 +7,26 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 /** @title Send and view Tweeths */
 contract Tweether is Ownable {
   event TweethSent(
-    address indexed _owner,
+    address indexed _sender,
     uint256 indexed _nonce,
-    string _message
-  );
-
-  event TweethMention(
-    address indexed _owner,
-    uint256 indexed _nonce,
-    address indexed _mention,
+    bytes32 indexed _replyTo,
     string _message
   );
 
   struct Tweeth {
-    address owner;
+    address sender;
     uint256 nonce;
+    bytes32 replyTo;
     string message;
-    address[] mentions;
   }
 
   uint256 public maxTweethBytes;
-  uint256 public maxMentions;
 
   mapping(bytes32 => Tweeth) public tweeths;
   mapping(address => uint256) public nonceCounter;
 
-  constructor(uint256 _maxTweethBytes, uint256 _maxMentions) public {
+  constructor(uint256 _maxTweethBytes) public {
     maxTweethBytes = _maxTweethBytes;
-    maxMentions = _maxMentions;
   }
 
   /** @dev Set the maximum amount of bytes that messages can have.
@@ -44,43 +36,41 @@ contract Tweether is Ownable {
     maxTweethBytes = _maxTweethBytes;
   }
 
-  /** @dev Set the maximum amount of mentions that messages can have.
-    * @param _maxMentions Maximum number of mentions.
-    */
-  function setMaxMentions(uint256 _maxMentions) public onlyOwner {
-    maxMentions = _maxMentions;
-  }
-
   /** @dev Sends a tweeth.
     * @param _message Message that will be sent.
-    * @param _mentions Array of addresses that will be mentioned.
+    * @param _replyTo Hash of the tweeth this one replies to
     */
-  function sendTweeth(string memory _message, address[] memory _mentions) public {
+  function sendTweeth(string memory _message, bytes32 _replyTo) public {
     require(bytes(_message).length <= maxTweethBytes, "Maximum byte length for tweeth exceeded");
-    require(_mentions.length <= maxMentions, "Maximum mentions exceeded");
+    require(_replyTo == 0x0000000000000000000000000000000000000000000000000000000000000000
+      || tweeths[_replyTo].sender != 0x0000000000000000000000000000000000000000, "The Tweeth referenced does not exist");
 
     uint256 nonce = nonceCounter[msg.sender]++;
     Tweeth storage newTweeth = tweeths[keccak256(abi.encodePacked(msg.sender, nonce))];
 
-    newTweeth.owner = msg.sender;
+    newTweeth.sender = msg.sender;
     newTweeth.nonce = nonce;
+    newTweeth.replyTo = _replyTo;
     newTweeth.message = _message;
-    newTweeth.mentions = _mentions;
 
-    emit TweethSent(msg.sender, nonce, _message);
-
-    // Mentions are limited by design, so it shouldn't be possible to send enough to run out of gas.
-    for (uint256 i = 0; i < _mentions.length; i++) {
-      emit TweethMention(msg.sender, nonce, _mentions[i], _message);
-    }
+    emit TweethSent(msg.sender, nonce, _replyTo, _message);
   }
 
   /** @dev Retrieves a tweeth from the address of the sender and the nonce.
     * @param _sender Sender of the tweeth.
     * @param _nonce Nonce of the tweeth.
-    * @return Tweeth The corresponding tweeth for the _sender and _nonce.
+    * @return Tweeth for the corresponding _sender and _nonce.
     */
   function getTweeth(address _sender, uint256 _nonce) public view returns (Tweeth memory) {
     return tweeths[keccak256(abi.encodePacked(_sender, _nonce))];
+  }
+
+  /** @dev Retrieves a tweeth hash from the address of the sender and the nonce.
+    * @param _sender Sender of the tweeth.
+    * @param _nonce Nonce of the tweeth.
+    * @return Tweeth hash for the corresponding _sender and _nonce.
+    */
+  function getTweethHash(address _sender, uint256 _nonce) public pure returns (bytes32) {
+    return keccak256(abi.encodePacked(_sender, _nonce));
   }
 }
