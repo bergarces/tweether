@@ -36,24 +36,6 @@ function Dapp() {
       const account = accounts[0]
 
       const networkId = await web3Provider.eth.net.getId()
-      const tweetherAddress = TweetherArtifact.networks[networkId].address
-      const tweetherContract = new web3Provider.eth.Contract(
-        TweetherArtifact.abi,
-        tweetherAddress
-      )
-
-      const tweetherIdentityAddress =
-        TweetherIdentityArtifact.networks[networkId].address
-      const tweetherIdentityContract = new web3Provider.eth.Contract(
-        TweetherIdentityArtifact.abi,
-        tweetherIdentityAddress
-      )
-
-      setWeb3Provider(web3Provider)
-      setTweetherContract(tweetherContract)
-      setTweetherIdentityContract(tweetherIdentityContract)
-      setAccount(account)
-
       if (networkId === 777) {
         web3Provider.eth.ens.registryAddress =
           ENSRegistryArtifact.networks[networkId].address
@@ -66,6 +48,25 @@ function Dapp() {
         )
         console.log('ENS TEST', { account1, account2, tweether, profile })
       }
+
+      const tweetherProxyAddress = await web3Provider.eth.ens.getAddress('tweether.test')
+      const tweetherContract = new web3Provider.eth.Contract(
+        TweetherArtifact.abi,
+        tweetherProxyAddress
+      )
+
+      const tweetherIdentityAddress = await web3Provider.eth.ens.getAddress(
+        'profile.tweether.test'
+      )
+      const tweetherIdentityContract = new web3Provider.eth.Contract(
+        TweetherIdentityArtifact.abi,
+        tweetherIdentityAddress
+      )
+
+      setWeb3Provider(web3Provider)
+      setTweetherContract(tweetherContract)
+      setTweetherIdentityContract(tweetherIdentityContract)
+      setAccount(account)
     }
 
     init()

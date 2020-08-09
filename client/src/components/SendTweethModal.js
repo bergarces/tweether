@@ -29,7 +29,6 @@ function SendTweethModal({ replyTo, show, handleClose }) {
           <Modal.Title>Send Tweeth</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {replyTo ? 'REPLYING' : 'NOT REPLYING'}
           <textarea
             name="message"
             rows="4"
@@ -48,7 +47,7 @@ function SendTweethModal({ replyTo, show, handleClose }) {
             Close
           </Button>
           <Button variant="primary" type="submit">
-            Save Changes
+            Send
           </Button>
         </Modal.Footer>
       </form>

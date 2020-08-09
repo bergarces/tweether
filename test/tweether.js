@@ -3,6 +3,8 @@ const defaults = require('../data/defaults')
 const truffleAssert = require('truffle-assertions')
 
 contract("Tweether", accounts => {
+  const bytes32Zero = "0x0000000000000000000000000000000000000000000000000000000000000000"
+
   let tweether
 
   before(async () => {
@@ -38,8 +40,6 @@ contract("Tweether", accounts => {
   })
 
   describe("sendTweeth", () => {
-    const bytes32Zero = "0x0000000000000000000000000000000000000000000000000000000000000000"
-
     it("should send a tweeth correctly", async () => {
       await tweether.sendTweeth("This is a Tweeth", web3.utils.hexToBytes(bytes32Zero), { from: accounts[1] })
 
@@ -69,9 +69,33 @@ contract("Tweether", accounts => {
       const message = "x".repeat(defaults.MAX_BYTES_TWEETH + 1)
 
       await truffleAssert.fails(
-        tweether.sendTweeth(message, [], { from: accounts[1] }),
+        tweether.sendTweeth(message, web3.utils.hexToBytes(bytes32Zero), { from: accounts[1] }),
+        truffleAssert.ErrorType.REVERT,
+        "Maximum byte length for tweeth exceeded."
+      )
+    })
+  })
+
+  describe("toggleCircuitBreaker", () => {
+    it("should prevent sending new tweeths after it's been toggled", async () => {
+      await tweether.toggleCircuitBreaker()
+
+      const circuitBreakerStatus = await tweether.circuitBreaker()
+
+      assert.isOk(circuitBreakerStatus)
+      await truffleAssert.fails(
+        tweether.sendTweeth("Test tweeth", web3.utils.hexToBytes(bytes32Zero), { from: accounts[1] }),
         truffleAssert.ErrorType.REVERT
       )
+    })
+
+    it("should be possible to enable sending new tweeths again", async () => {
+      await tweether.toggleCircuitBreaker()
+
+      const circuitBreakerStatus = await tweether.circuitBreaker()
+
+      assert.isNotOk(circuitBreakerStatus)
+      await tweether.sendTweeth("Test tweeth", web3.utils.hexToBytes(bytes32Zero), { from: accounts[1] })
     })
   })
 })

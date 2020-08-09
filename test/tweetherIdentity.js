@@ -50,7 +50,8 @@ contract("TweetherIdentity", accounts => {
 
       await truffleAssert.fails(
         tweetherIdentity.setBio(bio, { from: accounts[1] }),
-        truffleAssert.ErrorType.REVERT
+        truffleAssert.ErrorType.REVERT,
+        "Maximum byte length for bio exceeded"
       )
     })
   })

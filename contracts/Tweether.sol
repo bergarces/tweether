@@ -26,8 +26,16 @@ contract Tweether is Ownable {
   mapping(bytes32 => Tweeth) public tweeths;
   mapping(address => uint256) public nonceCounter;
 
+  bool public circuitBreaker;
+
   constructor(uint256 _maxTweethBytes) public {
     maxTweethBytes = _maxTweethBytes;
+  }
+
+  /** @dev Toggles the circuit breaker to prevent sending new tweeths.
+    */
+  function toggleCircuitBreaker() public onlyOwner {
+    circuitBreaker = !circuitBreaker;
   }
 
   /** @dev Set the maximum amount of bytes that messages can have.
@@ -42,6 +50,7 @@ contract Tweether is Ownable {
     * @param _replyTo Hash of the tweeth this one replies to
     */
   function sendTweeth(string memory _message, bytes32 _replyTo) public {
+    require(!circuitBreaker, "Circuit breaker activated, sending tweeths temporarily disallowed");
     require(bytes(_message).length <= maxTweethBytes, "Maximum byte length for tweeth exceeded");
     require(_replyTo == 0x0000000000000000000000000000000000000000000000000000000000000000
       || tweeths[_replyTo].sender != 0x0000000000000000000000000000000000000000, "The Tweeth referenced does not exist");
