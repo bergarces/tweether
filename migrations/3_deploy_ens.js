@@ -1,3 +1,6 @@
+// Code based on the snippet provided on the ENS documentation page
+// https://docs.ens.domains/deploying-ens-on-a-private-chain#migration-file-example
+
 const ENS = artifacts.require("@ensdomains/ens/ENSRegistry");
 const FIFSRegistrar = artifacts.require("@ensdomains/ens/FIFSRegistrar");
 const ReverseRegistrar = artifacts.require("@ensdomains/ens/ReverseRegistrar");
