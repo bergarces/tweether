@@ -37,6 +37,7 @@ Finally, run the following command to deploy contracts, which include a local EN
 Once the previous step is completed successfully, move into the client directory and start the React app:
 ```
 cd client
+npm i
 npm start
 ```
 
