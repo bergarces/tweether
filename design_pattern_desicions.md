@@ -10,4 +10,8 @@ The Tweether contract has been deployed with an upgradable proxy. This way, if a
 
 The tweeth data stays in the proxy contract, which just delegates the execution of the calls to the delegate contract. The delegate contract can be changed as long as the storage layout is compatible with the previous one.
 
-It is possible to implement upgradable contracts using the openzeppelin framework, but for this case a simple assembly contract with a fallback method and a method to update the delegate has been used.
+It is possible to implement upgradable contracts using the OpenZeppelin framework, but for this case a simple assembly contract with a fallback method and a method to update the delegate has been used.
+
+## Restricting Access
+
+Both Tweether and TweetherIdentity implement the Ownable contract from OpenZeppelin in order to limit the methods the users have access to. Only the contract owner can change the maximum size of the string data that can be stored, toggle the circuit breaker and change the delegate for the proxy contract.
