@@ -10,6 +10,24 @@ The Dapp has the following features:
  - Change your bio details for others to read.
  - View the bio details of other users.
 
+## Contracts
+
+### TweetherIdentity
+
+This contract just allows the user to set a bio/description for its account and fetch the bio of any other account. The bio has a limited number of bytes.
+
+The reason we use bytes for the length instead of characters is because the solidity logic to get the length of characters would increase the cost of using it, since utf can have characters of multiple bytes. The length can be adjusted by the contract owner.
+
+### Tweether
+
+This contract allows the user to submit new tweeths, whether they are new ones or replies. It also allows to get the content of existing tweeths.
+
+The tweeth message length is also limited by bytes length, and this length can be modified by the owner of the contract.
+
+### TweetherProxy
+
+In order to allow upgrades for the Tweether contract, a proxy upgrade pattern is being used. This is the contract that has the storage and it just delegates call to the Tweether contract, which can be changed by the owner at any given point.
+
 # Requirements
 
  - Node 10
