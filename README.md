@@ -41,7 +41,7 @@ npm i
 npm start
 ```
 
-If everything started successfully, the Dapp should open on `localhost:3000`. Ensure that the browser used has Metamask installed.
+If everything started successfully, the Dapp should open on `localhost:3000`. Ensure that the browser used has Metamask installed. And that **Metamask is network is set to localhost:8545**.
 
 # Import Metamask accounts
 In order to use the Dapp from a local setup, ensure Metamask netwrok is set to `localhost:8545`. Then import the following two accounts using the private keys (which are the ones generated with ganache):
