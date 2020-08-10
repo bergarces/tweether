@@ -30,7 +30,7 @@ const ACCOUNT2_ROOT_LABEL = `${ACCOUNT2_LABEL}.${tld}`
 const ACCOUNT2_NODE = namehash.hash(ACCOUNT2_ROOT_LABEL)
 
 module.exports = function(deployer, network, accounts) {
-  if(deployer.network_id != 777){
+  if(deployer.network_id < 10){
     return
   }
 

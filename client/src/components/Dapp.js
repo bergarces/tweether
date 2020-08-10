@@ -8,6 +8,7 @@ import Row from 'react-bootstrap/Row'
 
 import Web3ProviderContext from '../contexts/Web3ProviderContext'
 import TweetherArtifact from '../contracts/Tweether.json'
+import TweetherProxyArtifact from '../contracts/TweetherProxy.json'
 import TweetherIdentityArtifact from '../contracts/TweetherIdentity.json'
 import ENSRegistryArtifact from '../contracts/ENSRegistry.json'
 
@@ -36,30 +37,34 @@ function Dapp() {
       const account = accounts[0]
 
       const networkId = await web3Provider.eth.net.getId()
-      if (networkId === 777) {
+      if (networkId > 10) {
         web3Provider.eth.ens.registryAddress =
           ENSRegistryArtifact.networks[networkId].address
-
-        const account1 = await web3Provider.eth.ens.getAddress('account1.eth')
-        const account2 = await web3Provider.eth.ens.getAddress('account2.eth')
-        const tweether = await web3Provider.eth.ens.getAddress('tweether.eth')
-        const profile = await web3Provider.eth.ens.getAddress(
-          'identity.tweether.eth'
-        )
-        console.log('ENS TEST', { account1, account2, tweether, profile })
       }
 
-      const tweetherProxyAddress = await web3Provider.eth.ens.getAddress(
-        'tweether.eth'
-      )
+      let tweetherProxyAddress
+      try {
+        tweetherProxyAddress = await web3Provider.eth.ens.getAddress(
+          'tweether.eth'
+        )
+      } catch (error) {
+        tweetherProxyAddress = TweetherProxyArtifact.networks[networkId].address
+      }
+
       const tweetherContract = new web3Provider.eth.Contract(
         TweetherArtifact.abi,
         tweetherProxyAddress
       )
 
-      const tweetherIdentityAddress = await web3Provider.eth.ens.getAddress(
-        'identity.tweether.eth'
-      )
+      let tweetherIdentityAddress
+      try {
+        tweetherIdentityAddress = await web3Provider.eth.ens.getAddress(
+          'identity.tweether.eth'
+        )
+      } catch (error) {
+        tweetherIdentityAddress = TweetherIdentityArtifact.networks[networkId].address
+      }
+
       const tweetherIdentityContract = new web3Provider.eth.Contract(
         TweetherIdentityArtifact.abi,
         tweetherIdentityAddress
