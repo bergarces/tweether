@@ -75,6 +75,10 @@ The following domain names are set up during migration if the Chain Id is set to
  - `account1.eth` for the first imported account.
  - `account2.eth` for the second imported account.
 
+# Rinkeby
+
+The contracts and ENS (for `tweether.eth` and `identity.tweether.eth` only) are deployed and set up on the Rinkeby network, so it should be possible to use it by switching Metamask network to Rinkeby.
+
 # TODO
  - Add reverse name resolution.
  - Select numbers of tweeths to display and add pagination.
