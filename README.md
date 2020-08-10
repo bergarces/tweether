@@ -21,14 +21,17 @@ In order to set the project up on for local development. Node 10 is needed. Depe
 The setup process consists on starting a local blockchain, deploy contracts and starting the client.
 
 Start by cloning the code locally and moving to the root directory, and install dependencies with:
+
 `npm i`
 
 Then start a local blockchain with a **predefined seed** and on **Chain Id 777** with:
+
 `npm ganache`
 
 The predefined seed allows you to always import the same private accounts to Metamask for testing. It is possible to create different seeds each time, but then different accounts will need to be imported to Metamask.
 
 Finally, run the following command to deploy contracts, which include a local ENS registry and name setup for contracts, as well as the first two predefined account for ganache.
+
 `npm migrate`
 
 Once the previous step is completed successfully, move into the client directory and start the React app:
