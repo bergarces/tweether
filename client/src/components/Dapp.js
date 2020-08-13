@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react'
-import * as Web3 from 'web3'
+import React, { useContext, useState } from 'react'
 
 import Alert from 'react-bootstrap/Alert'
 import Button from 'react-bootstrap/Button'
@@ -7,87 +6,20 @@ import Col from 'react-bootstrap/Col'
 import Row from 'react-bootstrap/Row'
 
 import Web3ProviderContext from '../contexts/Web3ProviderContext'
-import TweetherArtifact from '../contracts/Tweether.json'
-import TweetherProxyArtifact from '../contracts/TweetherProxy.json'
-import TweetherIdentityArtifact from '../contracts/TweetherIdentity.json'
-import ENSRegistryArtifact from '../contracts/ENSRegistry.json'
 
 import IdentityModal from './IdentityModal'
 import SendTweethModal from './SendTweethModal'
 import SearchTweeths from './SearchTweeths'
 
 function Dapp() {
+  const { account } = useContext(Web3ProviderContext)
+
   const [showSendModal, setShowSendModal] = useState(false)
   const [showProfileModal, setShowProfileModal] = useState(false)
   const [displayOwnTweeths, setDisplayOwnTweeths] = useState(true)
 
-  const [web3Provider, setWeb3Provider] = useState(undefined)
-  const [account, setAccount] = useState(undefined)
-  const [tweetherContract, setTweetherContract] = useState(undefined)
-  const [tweetherIdentityContract, setTweetherIdentityContract] = useState(
-    undefined
-  )
-
-  useEffect(() => {
-    const init = async () => {
-      window.ethereum.autoRefreshOnNetworkChange = false
-      const web3Provider = new Web3(window.ethereum)
-
-      const accounts = await web3Provider.eth.getAccounts()
-      const account = accounts[0]
-
-      const networkId = await web3Provider.eth.net.getId()
-      if (networkId > 10) {
-        web3Provider.eth.ens.registryAddress =
-          ENSRegistryArtifact.networks[networkId].address
-      }
-
-      let tweetherProxyAddress
-      try {
-        tweetherProxyAddress = await web3Provider.eth.ens.getAddress(
-          'tweether.eth'
-        )
-      } catch (error) {
-        tweetherProxyAddress = TweetherProxyArtifact.networks[networkId].address
-      }
-
-      const tweetherContract = new web3Provider.eth.Contract(
-        TweetherArtifact.abi,
-        tweetherProxyAddress
-      )
-
-      let tweetherIdentityAddress
-      try {
-        tweetherIdentityAddress = await web3Provider.eth.ens.getAddress(
-          'identity.tweether.eth'
-        )
-      } catch (error) {
-        tweetherIdentityAddress = TweetherIdentityArtifact.networks[networkId].address
-      }
-
-      const tweetherIdentityContract = new web3Provider.eth.Contract(
-        TweetherIdentityArtifact.abi,
-        tweetherIdentityAddress
-      )
-
-      setWeb3Provider(web3Provider)
-      setTweetherContract(tweetherContract)
-      setTweetherIdentityContract(tweetherIdentityContract)
-      setAccount(account)
-    }
-
-    init()
-  }, [])
-
   return (
-    <Web3ProviderContext.Provider
-      value={{
-        web3Provider,
-        account,
-        tweetherContract,
-        tweetherIdentityContract,
-      }}
-    >
+    <>
       <Row className="justify-content-md-center mb-4">
         <Col md="auto">
           <Alert variant="info">Connected from account {account}</Alert>
@@ -129,7 +61,7 @@ function Dapp() {
         show={showProfileModal}
         handleClose={() => setShowProfileModal(false)}
       />
-    </Web3ProviderContext.Provider>
+    </>
   )
 }
 
