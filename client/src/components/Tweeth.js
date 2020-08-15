@@ -26,7 +26,7 @@ function Tweeth({ tweeth, searchQuery, setSearchQuery }) {
           </Card.Subtitle>
           <Card.Text>
             Block Timestamp:{' '}
-            {new Date(tweeth?.timestamp * 1000).toLocaleString()}
+            {new Date(tweeth.timestamp * 1000).toLocaleString()}
             <br />
             Hash: {tweeth.hash}
             {tweeth.replyTo !==
@@ -53,16 +53,17 @@ function Tweeth({ tweeth, searchQuery, setSearchQuery }) {
           >
             View Replies
           </Button>
-          {tweeth?.replyTo !==
-            '0x0000000000000000000000000000000000000000000000000000000000000000' && (
-            <Button
-              variant="primary"
-              onClick={() => setSearchQuery({ hash: tweeth.replyTo })}
-              className="mr-1"
-            >
-              View Parent
-            </Button>
-          )}
+          {tweeth.replyTo !==
+            '0x0000000000000000000000000000000000000000000000000000000000000000' &&
+            tweeth.replyTo !== searchQuery.hash && (
+              <Button
+                variant="primary"
+                onClick={() => setSearchQuery({ hash: tweeth.replyTo })}
+                className="mr-1"
+              >
+                View Parent
+              </Button>
+            )}
           <Button
             variant="primary"
             onClick={() => setShowSendModal(true)}
