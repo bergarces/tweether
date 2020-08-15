@@ -18,21 +18,17 @@ function UserTweeths({
 }) {
   const { web3Provider, tweetherContract } = useContext(Web3ProviderContext)
   const [tweeths, setTweeths] = useState([])
-  const [subscription, setSubscription] = useState(undefined)
 
   useEffect(() => {
     const init = async () => {
       if (!tweetherContract) {
         return
       }
-
-      if (subscription) {
-        subscription.unsubscribe()
-      }
       setTweeths([])
 
+      let subscription
       if (address) {
-        const subscription = tweetherContract.events
+        subscription = tweetherContract.events
           .TweethSent({
             fromBlock: (await web3Provider.eth.getBlockNumber()) + 1,
             filter: { _sender: address },
@@ -46,11 +42,10 @@ function UserTweeths({
             )
           })
           .on('error', console.error)
-        setSubscription(subscription)
 
         fetchTweethsByAddress(tweetherContract, address, maxTweeths, setTweeths)
       } else if (repliesTo) {
-        const subscription = tweetherContract.events
+        subscription = tweetherContract.events
           .TweethSent({
             fromBlock: (await web3Provider.eth.getBlockNumber()) + 1,
             filter: { _replyTo: repliesTo },
@@ -59,9 +54,14 @@ function UserTweeths({
             fetchTweethsByThread(tweetherContract, repliesTo, setTweeths)
           })
           .on('error', console.error)
-        setSubscription(subscription)
 
         fetchTweethsByThread(tweetherContract, repliesTo, setTweeths)
+      }
+
+      if (subscription) {
+        return () => {
+          subscription.unsubscribe()
+        }
       }
     }
 
