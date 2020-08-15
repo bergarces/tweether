@@ -22,8 +22,16 @@ function SearchBar({ searchQuery, setSearchQuery }) {
       } else {
         message = `Searching tweeths from ${searchQuery.address}`
       }
+
+      if (searchField.toLowerCase() !== searchQuery.address.toLowerCase()) {
+        setSearchField('')
+      }
     } else if (searchQuery.hash) {
       message = `Searching tweeth and replies for hash ${searchQuery.hash}`
+
+      if (searchField.toLowerCase() !== searchQuery.hash.toLowerCase()) {
+        setSearchField('')
+      }
     }
 
     setSearchMessage({ type: 'info', message })

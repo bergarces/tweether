@@ -69,6 +69,7 @@ function Dapp() {
       <SendTweethModal
         show={showSendModal}
         handleClose={() => setShowSendModal(false)}
+        searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
       />
       <IdentityModal

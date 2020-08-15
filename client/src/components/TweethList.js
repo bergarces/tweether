@@ -82,6 +82,7 @@ function TweethList({ searchQuery, setSearchQuery }) {
         <Tweeth
           key={tweeth.hash}
           tweeth={tweeth}
+          searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
         />
       ))}

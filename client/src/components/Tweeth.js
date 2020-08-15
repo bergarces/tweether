@@ -8,7 +8,7 @@ import ListGroup from 'react-bootstrap/ListGroup'
 import IdentityModal from './IdentityModal'
 import SendTweethModal from './SendTweethModal'
 
-function Tweeth({ tweeth, setSearchQuery }) {
+function Tweeth({ tweeth, searchQuery, setSearchQuery }) {
   const [showProfileModal, setShowProfileModal] = useState(false)
   const [showSendModal, setShowSendModal] = useState(false)
 
@@ -82,6 +82,7 @@ function Tweeth({ tweeth, setSearchQuery }) {
         replyTo={tweeth.hash}
         show={showSendModal}
         handleClose={() => setShowSendModal(false)}
+        searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
       />
     </ListGroup.Item>
