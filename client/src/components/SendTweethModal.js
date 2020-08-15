@@ -13,7 +13,7 @@ function SendTweethModal({ replyTo, show, handleClose }) {
   const { account, tweetherContract } = useContext(Web3ProviderContext)
   const { register, handleSubmit, errors } = useForm()
 
-  const onSubmit = async (formData) => {
+  const onSubmit = (formData) => {
     tweetherContract.methods
       .sendTweeth(formData.message, replyTo ? replyTo : bytes32Zero)
       .send({ from: account })

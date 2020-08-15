@@ -28,7 +28,9 @@ function TweethList({ searchQuery, setSearchQuery }) {
             tweetherContract
           )
             .then((tweeth) =>
-              setTweeths((previousTweeths) => orderTweeths([...previousTweeths, tweeth]))
+              setTweeths((previousTweeths) =>
+                orderTweeths([...previousTweeths, tweeth])
+              )
             )
             .catch(console.error)
         })
@@ -36,7 +38,9 @@ function TweethList({ searchQuery, setSearchQuery }) {
     } else if (searchQuery.hash) {
       fetchTweethByHash(searchQuery.hash, tweetherContract)
         .then((tweeth) => {
-          setTweeths((previousTweeths) => orderTweeths([...previousTweeths, tweeth], searchQuery.hash))
+          setTweeths((previousTweeths) =>
+            orderTweeths([...previousTweeths, tweeth], searchQuery.hash)
+          )
         })
         .catch(console.error)
 
@@ -52,7 +56,9 @@ function TweethList({ searchQuery, setSearchQuery }) {
             tweetherContract
           )
             .then((tweeth) =>
-              setTweeths((previousTweeths) => orderTweeths([...previousTweeths, tweeth], searchQuery.hash))
+              setTweeths((previousTweeths) =>
+                orderTweeths([...previousTweeths, tweeth], searchQuery.hash)
+              )
             )
             .catch(console.error)
         })
@@ -69,7 +75,11 @@ function TweethList({ searchQuery, setSearchQuery }) {
   return (
     <ListGroup>
       {tweeths.map((tweeth) => (
-        <Tweeth key={tweeth.hash} tweeth={tweeth} setSearchQuery={setSearchQuery} />
+        <Tweeth
+          key={tweeth.hash}
+          tweeth={tweeth}
+          setSearchQuery={setSearchQuery}
+        />
       ))}
     </ListGroup>
   )

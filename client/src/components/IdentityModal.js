@@ -1,15 +1,14 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
+import Spinner from 'react-bootstrap/Spinner'
 
 import Web3ProviderContext from '../contexts/Web3ProviderContext'
 
 function IdentityModal({ address, show, handleClose }) {
-  const { web3Provider, tweetherIdentityContract, account } = useContext(
-    Web3ProviderContext
-  )
+  const { tweetherIdentityContract, account } = useContext(Web3ProviderContext)
   const { register, handleSubmit, errors } = useForm()
   const [bio, setBio] = useState(undefined)
   const [edit, setEdit] = useState(false)
@@ -18,27 +17,24 @@ function IdentityModal({ address, show, handleClose }) {
   const canEdit = address === account
 
   const onSubmit = async (formData) => {
-    await tweetherIdentityContract.methods
-      .setBio(formData.bio)
-      .send({ from: address })
     setEdit(false)
     setWaitingForTx(true)
+
+    try {
+      const result = await tweetherIdentityContract.methods
+        .setBio(formData.bio)
+        .send({ from: address })
+      setBio(result.events['BioChanged'].returnValues._bio)
+    } catch (error) {
+      console.error(error)
+    }
+
+    setWaitingForTx(false)
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     const init = async () => {
-      if (tweetherIdentityContract && address) {
-        tweetherIdentityContract.events
-          .BioChanged({
-            fromBlock: (await web3Provider.eth.getBlockNumber()) + 1,
-            filter: { address },
-          })
-          .on('data', (data) => {
-            setBio(data.returnValues._bio)
-            setWaitingForTx(false)
-          })
-          .on('error', console.error)
-
+      if (tweetherIdentityContract && address && show) {
         const fetchedBio = await tweetherIdentityContract.methods
           .bio(address)
           .call()
@@ -48,17 +44,24 @@ function IdentityModal({ address, show, handleClose }) {
       }
     }
     init()
-  }, [web3Provider, tweetherIdentityContract, address])
+  }, [tweetherIdentityContract, address, show])
 
-  const setEditor = (e) => {
-    e.preventDefault()
-    setEdit(true)
+  const setEditor = (event) => {
+    if (!edit) {
+      event.preventDefault()
+      setEdit(true)
+    }
+  }
+
+  const closeEditor = () => {
+    setEdit(false)
+    handleClose()
   }
 
   const isValidSize = (bio) => new Blob([bio]).size < 1000
 
   return (
-    <Modal show={show} onHide={handleClose}>
+    <Modal show={show} onHide={closeEditor}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Modal.Header closeButton>
           <Modal.Title>Account Identity</Modal.Title>
@@ -77,28 +80,49 @@ function IdentityModal({ address, show, handleClose }) {
                 ref={register({ validate: isValidSize })}
               />
               {errors.bio?.type === 'validate' && (
-                <span>Length of the field exceeds 280 bytes</span>
+                <span>Length of the field exceeds 1000 bytes</span>
               )}
             </>
           ) : waitingForTx ? (
-            'Waiting for bio to be updated'
+            <Spinner
+              as="span"
+              animation="border"
+              size="sm"
+              role="status"
+              aria-hidden="true"
+            />
           ) : (
             bio
           )}
         </Modal.Body>
         <Modal.Footer>
-          {canEdit &&
-            (edit ? (
-              <Button variant="primary" type="submit">
-                Save Changes
-              </Button>
-            ) : (
-              <Button variant="primary" onClick={setEditor}>
-                Edit
-              </Button>
-            ))}
+          {canEdit && (
+            <Button
+              variant="primary"
+              type="submit"
+              onClick={setEditor}
+              disabled={waitingForTx}
+            >
+              {edit || waitingForTx ? (
+                <>
+                  {waitingForTx && (
+                    <Spinner
+                      as="span"
+                      animation="border"
+                      size="sm"
+                      role="status"
+                      aria-hidden="true"
+                    />
+                  )}
+                  Save Changes
+                </>
+              ) : (
+                'Edit'
+              )}
+            </Button>
+          )}
 
-          <Button variant="primary" onClick={handleClose}>
+          <Button variant="primary" onClick={closeEditor}>
             Close
           </Button>
         </Modal.Footer>

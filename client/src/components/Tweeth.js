@@ -43,22 +43,22 @@ function Tweeth({ tweeth, setSearchQuery }) {
             View Profile
           </Button>
           <Button
+            variant="primary"
+            onClick={() => setSearchQuery({ hash: tweeth.hash })}
+            className="mr-1"
+          >
+            View Replies
+          </Button>
+          {tweeth?.replyTo !==
+            '0x0000000000000000000000000000000000000000000000000000000000000000' && (
+            <Button
               variant="primary"
-              onClick={() => setSearchQuery({ hash: tweeth.hash })}
+              onClick={() => setSearchQuery({ hash: tweeth.replyTo })}
               className="mr-1"
             >
-              View Replies
+              View Parent
             </Button>
-            {tweeth?.replyTo !==
-              '0x0000000000000000000000000000000000000000000000000000000000000000' && (
-              <Button
-                variant="primary"
-                onClick={() => setSearchQuery({ hash: tweeth.replyTo })}
-                className="mr-1"
-              >
-                View Parent
-              </Button>
-            )}
+          )}
           <Button
             variant="primary"
             onClick={() => setShowSendModal(true)}
