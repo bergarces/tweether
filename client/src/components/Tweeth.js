@@ -62,7 +62,7 @@ function Tweeth({
         <Card>
           <Card.Body>
             <Card.Title>{name || address}</Card.Title>
-            <Card.Text>
+            <Card.Subtitle>
               <Alert variant="info">{tweeth?.message}</Alert>
               Block Timestamp:{' '}
               {tweeth?.timestamp
@@ -77,7 +77,7 @@ function Tweeth({
                   Reply To: {tweeth?.replyTo}
                 </>
               )}
-            </Card.Text>
+            </Card.Subtitle>
           </Card.Body>
           <Card.Footer>
             <Button
