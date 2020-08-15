@@ -44,13 +44,13 @@ Start by cloning the code locally and moving to the root directory, and install 
 
 Then start a local blockchain with a **predefined seed** and on **Chain Id 777** with:
 
-`npm ganache`
+`npm run ganache`
 
 The predefined seed allows you to always import the same private accounts to Metamask for testing. It is possible to create different seeds each time, but then different accounts will need to be imported to Metamask.
 
 Finally, run the following command to deploy contracts, which include a local ENS registry and name setup for contracts, as well as the first two predefined account for ganache.
 
-`npm migrate`
+`npm run migrate`
 
 Once the previous step is completed successfully, move into the client directory and start the React app:
 ```
