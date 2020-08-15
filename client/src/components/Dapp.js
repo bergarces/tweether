@@ -9,30 +9,37 @@ import Web3ProviderContext from '../contexts/Web3ProviderContext'
 
 import IdentityModal from './IdentityModal'
 import SendTweethModal from './SendTweethModal'
-import SearchTweeths from './SearchTweeths'
+import SearchBar from './SearchBar'
+import TweethList from './TweethList'
 
 function Dapp() {
   const { account } = useContext(Web3ProviderContext)
 
   const [showSendModal, setShowSendModal] = useState(false)
   const [showProfileModal, setShowProfileModal] = useState(false)
-  const [displayOwnTweeths, setDisplayOwnTweeths] = useState(true)
+
+  const [searchQuery, setSearchQuery] = useState({ address: account })
 
   return (
     <>
-      <Row className="justify-content-md-center mb-4">
+      <Row className="justify-content-md-center">
         <Col md="auto">
           <Alert variant="info">Connected from account {account}</Alert>
         </Col>
       </Row>
-      <Row className="justify-content-md-center mb-4">
+      <Row className="justify-content-md-center mb-5">
         <Col md="auto">
           <Button variant="primary" onClick={() => setShowSendModal(true)}>
             Send a Tweeth
           </Button>
         </Col>
         <Col md="auto">
-          <Button variant="primary" onClick={() => setDisplayOwnTweeths(true)}>
+          <Button
+            variant="primary"
+            onClick={() => {
+              setSearchQuery({ address: account })
+            }}
+          >
             My Tweeths
           </Button>
         </Col>
@@ -42,12 +49,19 @@ function Dapp() {
           </Button>
         </Col>
       </Row>
-      <Row className="justify-content-md-center mb-4">
+      <Row className="justify-content-md-center">
         <Col md="auto">
-          <SearchTweeths
-            displayOwnTweeths={displayOwnTweeths}
-            cancelDisplayOwnTweeths={() => setDisplayOwnTweeths(false)}
-            maxTweeths={10}
+          <SearchBar
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+          />
+        </Col>
+      </Row>
+      <Row className="justify-content-md-center">
+        <Col md="auto">
+          <TweethList
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
           />
         </Col>
       </Row>

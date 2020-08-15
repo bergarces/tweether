@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import * as ENS from 'ethereum-ens'
 import * as Web3 from 'web3'
 
 import Alert from 'react-bootstrap/Alert'
@@ -11,86 +12,115 @@ import Jumbotron from 'react-bootstrap/Jumbotron'
 import './App.scss'
 import Dapp from './components/Dapp'
 import Web3ProviderContext from './contexts/Web3ProviderContext'
+import ENSRegistryArtifact from './contracts/ENSRegistry.json'
 import fetchContracts from './fetchContracts'
 
 function App() {
-  const [web3Defined, setWeb3Defined] = useState(false)
   const [web3Provider, setWeb3Provider] = useState(undefined)
+  const [ens, setEns] = useState(undefined)
   const [contracts, setContracts] = useState({})
   const [account, setAccount] = useState(undefined)
 
-  const setMainAccount = accounts => {
+  const setMainAccount = (accounts) => {
     if (accounts.length > 0) {
       setAccount(accounts[0])
-      window.ethereum.on('accountsChanged', account => window.location.reload())
+      window.ethereum.on('accountsChanged', (account) =>
+        window.location.reload()
+      )
     }
   }
 
   useEffect(() => {
-    const web3Defined = typeof window.ethereum !== 'undefined'
+    const init = async () => {
+      const web3Defined = typeof window.ethereum !== 'undefined'
 
-    setWeb3Defined(web3Defined)
+      if (web3Defined) {
+        window.ethereum.autoRefreshOnNetworkChange = false
+        window.ethereum.on('chainChanged', () => window.location.reload())
 
-    if (web3Defined) {
-      window.ethereum.autoRefreshOnNetworkChange = false
-      window.ethereum.on('chainChanged', () => window.location.reload())
+        const web3Provider = new Web3(window.ethereum)
+        let ens
 
-      const web3Provider = new Web3(window.ethereum)
-      setWeb3Provider(web3Provider)
+        const networkId = await web3Provider.eth.net.getId()
+        if (networkId > 10) {
+          // For private networks, load the ENSRegistry address from the deployed contract
+          const ensRegistryAddress =
+            ENSRegistryArtifact.networks[networkId].address
+          ens = new ENS(web3Provider, ensRegistryAddress)
+        } else {
+          ens = new ENS(web3Provider)
+        }
 
-      fetchContracts(web3Provider)
-        .then(contracts => {
+        setWeb3Provider(web3Provider)
+        setEns(ens)
+
+        try {
+          const contracts = await fetchContracts(web3Provider, ens, networkId)
           setContracts(contracts)
 
-          return window.ethereum.request({ method: 'eth_accounts' })
-        })
-        .then(setMainAccount)
-        .catch(console.error)
+          const accounts = await window.ethereum.request({
+            method: 'eth_accounts',
+          })
+          setMainAccount(accounts)
+        } catch (error) {
+          console.error(error)
+        }
+      }
     }
+    init()
   }, [])
 
   const enableEthereum = async () => {
-    window.ethereum.request({ method: 'eth_requestAccounts' })
-      .then(setMainAccount)
-      .catch(console.error)
+    try {
+      const accounts = await window.ethereum.request({
+        method: 'eth_requestAccounts',
+      })
+      setMainAccount(accounts)
+    } catch (error) {
+      console.error(error)
+    }
   }
 
-  const preDappRenderTemplate = content => {
+  const preDappRenderTemplate = (content) => {
     return (
       <Row className="justify-content-md-center mb-4">
-        <Col md="auto">
-          {content}
-        </Col>
+        <Col md="auto">{content}</Col>
       </Row>
     )
   }
 
   let displayElement
-  if (!web3Defined) {
+  if (!web3Provider) {
     // Render web3 provider alert
     displayElement = preDappRenderTemplate(
-      (<Alert variant="danger">No web3 provider found.</Alert>)
+      <Alert variant="danger">No web3 provider found.</Alert>
     )
-  }
-  else if (!contracts.tweetherContract?._address || !contracts.tweetherIdentityContract?._address) {
+  } else if (
+    !contracts.tweetherContract?._address ||
+    !contracts.tweetherIdentityContract?._address
+  ) {
     // Render contracts not found for this network alert
     displayElement = preDappRenderTemplate(
-      (<Alert variant="danger">Tweether contracts not available in this network.</Alert>)
+      <Alert variant="danger">
+        Tweether contracts not available in this network.
+      </Alert>
     )
-  }
-  else if (!account) {
+  } else if (!account) {
     // Render button to enable ethereum
     displayElement = preDappRenderTemplate(
-      (<Button variant="primary" onClick={() => enableEthereum()}>Enable Ethereum</Button>)
+      <Button variant="primary" onClick={() => enableEthereum()}>
+        Enable Ethereum
+      </Button>
     )
-  }
-  else {
-   // Render Dapp
-   displayElement = (
-      <Web3ProviderContext.Provider value={{ web3Provider, ...contracts, account}}>
+  } else {
+    // Render Dapp
+    displayElement = (
+      <Web3ProviderContext.Provider
+        value={{ web3Provider, ens, ...contracts, account }}
+      >
         <Dapp />
       </Web3ProviderContext.Provider>
-    ) 
+    )
   }
 
   return (

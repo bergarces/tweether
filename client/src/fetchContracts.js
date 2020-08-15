@@ -1,21 +1,16 @@
-import ENSRegistryArtifact from './contracts/ENSRegistry.json'
 import TweetherArtifact from './contracts/Tweether.json'
 import TweetherProxyArtifact from './contracts/TweetherProxy.json'
 import TweetherIdentityArtifact from './contracts/TweetherIdentity.json'
 
-const fetchContracts = async web3Provider => {
-  const networkId = await web3Provider.eth.net.getId()
-  if (networkId > 10) {
-    web3Provider.eth.ens.registryAddress =
-      ENSRegistryArtifact.networks[networkId].address
-  }
-
+const fetchContracts = async (web3Provider, ens, networkId) => {
   let tweetherProxyAddress
   try {
-    tweetherProxyAddress = await web3Provider.eth.ens.getAddress(
-      'tweether.eth'
-    )
+    tweetherProxyAddress = await ens.resolver('tweether.eth').addr()
   } catch (error) {
+    console.error(
+      'Cannot resolve TweetherProxy contract address using ENS',
+      error
+    )
     const deployedContract = TweetherProxyArtifact.networks[networkId]
     tweetherProxyAddress = deployedContract && deployedContract.address
   }
@@ -27,10 +22,12 @@ const fetchContracts = async web3Provider => {
 
   let tweetherIdentityAddress
   try {
-    tweetherIdentityAddress = await web3Provider.eth.ens.getAddress(
-      'identity.tweether.eth'
-    )
+    tweetherIdentityAddress = await ens.resolver('identity.tweether.eth').addr()
   } catch (error) {
+    console.error(
+      'Cannot resolve TweetherIdentity contract address using ENS',
+      error
+    )
     const deployedContract = TweetherIdentityArtifact.networks[networkId]
     tweetherIdentityAddress = deployedContract && deployedContract.address
   }
@@ -42,7 +39,7 @@ const fetchContracts = async web3Provider => {
 
   return {
     tweetherContract,
-    tweetherIdentityContract
+    tweetherIdentityContract,
   }
 }
 
