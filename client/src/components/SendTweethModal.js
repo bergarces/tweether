@@ -9,7 +9,7 @@ import Web3ProviderContext from '../contexts/Web3ProviderContext'
 const bytes32Zero =
   '0x0000000000000000000000000000000000000000000000000000000000000000'
 
-function SendTweethModal({ replyTo, show, handleClose }) {
+function SendTweethModal({ replyTo, show, handleClose, setSearchQuery }) {
   const { account, tweetherContract } = useContext(Web3ProviderContext)
   const { register, handleSubmit, errors } = useForm()
 
@@ -17,6 +17,10 @@ function SendTweethModal({ replyTo, show, handleClose }) {
     tweetherContract.methods
       .sendTweeth(formData.message, replyTo ? replyTo : bytes32Zero)
       .send({ from: account })
+
+    if (replyTo) {
+      setSearchQuery({ hash: replyTo })
+    }
     handleClose()
   }
 

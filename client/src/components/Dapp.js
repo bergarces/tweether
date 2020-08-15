@@ -13,7 +13,7 @@ import SearchBar from './SearchBar'
 import TweethList from './TweethList'
 
 function Dapp() {
-  const { account } = useContext(Web3ProviderContext)
+  const { account, accountName } = useContext(Web3ProviderContext)
 
   const [showSendModal, setShowSendModal] = useState(false)
   const [showProfileModal, setShowProfileModal] = useState(false)
@@ -69,9 +69,11 @@ function Dapp() {
       <SendTweethModal
         show={showSendModal}
         handleClose={() => setShowSendModal(false)}
+        setSearchQuery={setSearchQuery}
       />
       <IdentityModal
         address={account}
+        addressName={accountName}
         show={showProfileModal}
         handleClose={() => setShowProfileModal(false)}
       />

@@ -14,16 +14,19 @@ import Dapp from './components/Dapp'
 import Web3ProviderContext from './contexts/Web3ProviderContext'
 import ENSRegistryArtifact from './contracts/ENSRegistry.json'
 import fetchContracts from './fetchContracts'
+import fetchEnsName from './fetchEnsName'
 
 function App() {
   const [web3Provider, setWeb3Provider] = useState(undefined)
   const [ens, setEns] = useState(undefined)
   const [contracts, setContracts] = useState({})
   const [account, setAccount] = useState(undefined)
+  const [accountName, setAccountName] = useState(undefined)
 
-  const setMainAccount = (accounts) => {
+  const setMainAccount = async (accounts) => {
     if (accounts.length > 0) {
       setAccount(accounts[0])
+
       window.ethereum.on('accountsChanged', (account) =>
         window.location.reload()
       )
@@ -69,6 +72,14 @@ function App() {
     }
     init()
   }, [])
+
+  useEffect(() => {
+    const init = async () => {
+      const mainAccountName = await fetchEnsName(account, ens)
+      setAccountName(mainAccountName)
+    }
+    init()
+  }, [ens, account])
 
   const enableEthereum = async () => {
     try {
@@ -116,7 +127,7 @@ function App() {
     // Render Dapp
     displayElement = (
       <Web3ProviderContext.Provider
-        value={{ web3Provider, ens, ...contracts, account }}
+        value={{ web3Provider, ens, ...contracts, account, accountName }}
       >
         <Dapp />
       </Web3ProviderContext.Provider>

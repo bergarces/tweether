@@ -16,7 +16,11 @@ function Tweeth({ tweeth, setSearchQuery }) {
     <ListGroup.Item>
       <Card>
         <Card.Body>
-          <Card.Title>{tweeth.sender}</Card.Title>
+          <Card.Title>
+            {tweeth.senderName
+              ? `${tweeth.senderName} (${tweeth.sender})`
+              : tweeth.sender}
+          </Card.Title>
           <Card.Subtitle>
             <Alert variant="info">{tweeth.message}</Alert>
           </Card.Subtitle>
@@ -70,13 +74,15 @@ function Tweeth({ tweeth, setSearchQuery }) {
       </Card>
       <IdentityModal
         address={tweeth.sender}
+        addressName={tweeth.senderName}
         show={showProfileModal}
         handleClose={() => setShowProfileModal(false)}
       />
       <SendTweethModal
-        replyTo={tweeth?.hash}
+        replyTo={tweeth.hash}
         show={showSendModal}
         handleClose={() => setShowSendModal(false)}
+        setSearchQuery={setSearchQuery}
       />
     </ListGroup.Item>
   )

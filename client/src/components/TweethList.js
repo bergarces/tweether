@@ -4,11 +4,12 @@ import _ from 'lodash'
 import ListGroup from 'react-bootstrap/ListGroup'
 
 import Web3ProviderContext from '../contexts/Web3ProviderContext'
+import fetchEnsName from '../fetchEnsName'
 
 import Tweeth from './Tweeth'
 
 function TweethList({ searchQuery, setSearchQuery }) {
-  const { tweetherContract } = useContext(Web3ProviderContext)
+  const { tweetherContract, ens } = useContext(Web3ProviderContext)
   const [tweeths, setTweeths] = useState([])
 
   useEffect(() => {
@@ -25,7 +26,9 @@ function TweethList({ searchQuery, setSearchQuery }) {
           fetchTweethBySender(
             event.returnValues._sender,
             event.returnValues._nonce,
-            tweetherContract
+            tweetherContract,
+            ens,
+            searchQuery.name
           )
             .then((tweeth) =>
               setTweeths((previousTweeths) =>
@@ -36,7 +39,7 @@ function TweethList({ searchQuery, setSearchQuery }) {
         })
         .on('error', console.error)
     } else if (searchQuery.hash) {
-      fetchTweethByHash(searchQuery.hash, tweetherContract)
+      fetchTweethByHash(searchQuery.hash, tweetherContract, ens)
         .then((tweeth) => {
           setTweeths((previousTweeths) =>
             orderTweeths([...previousTweeths, tweeth], searchQuery.hash)
@@ -53,7 +56,8 @@ function TweethList({ searchQuery, setSearchQuery }) {
           fetchTweethBySender(
             event.returnValues._sender,
             event.returnValues._nonce,
-            tweetherContract
+            tweetherContract,
+            ens
           )
             .then((tweeth) =>
               setTweeths((previousTweeths) =>
@@ -70,7 +74,7 @@ function TweethList({ searchQuery, setSearchQuery }) {
         subscription.unsubscribe()
       }
     }
-  }, [searchQuery, tweetherContract])
+  }, [searchQuery, tweetherContract, ens])
 
   return (
     <ListGroup>
@@ -99,20 +103,31 @@ const orderTweeths = (tweeths, mainTweethHash) => {
       )
 }
 
-const fetchTweethBySender = async (sender, nonce, tweetherContract) => {
+const fetchTweethBySender = async (
+  sender,
+  nonce,
+  tweetherContract,
+  ens,
+  senderName
+) => {
   const fetchedHash = await tweetherContract.methods
     .getTweethHash(sender, nonce)
     .call()
 
-  return fetchTweethByHash(fetchedHash, tweetherContract)
+  return fetchTweethByHash(fetchedHash, tweetherContract, ens, senderName)
 }
 
-const fetchTweethByHash = async (hash, tweetherContract) => {
+const fetchTweethByHash = async (hash, tweetherContract, ens, senderName) => {
   const fetchedTweeth = await tweetherContract.methods.tweeths(hash).call()
+
+  if (!senderName) {
+    senderName = await fetchEnsName(fetchedTweeth.sender, ens)
+  }
 
   return {
     hash: hash,
     sender: fetchedTweeth.sender,
+    senderName: senderName,
     nonce: fetchedTweeth.nonce,
     replyTo: fetchedTweeth.replyTo,
     message: fetchedTweeth.message,

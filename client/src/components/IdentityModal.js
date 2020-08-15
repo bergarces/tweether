@@ -7,7 +7,7 @@ import Spinner from 'react-bootstrap/Spinner'
 
 import Web3ProviderContext from '../contexts/Web3ProviderContext'
 
-function IdentityModal({ address, show, handleClose }) {
+function IdentityModal({ address, addressName, show, handleClose }) {
   const { tweetherIdentityContract, account } = useContext(Web3ProviderContext)
   const { register, handleSubmit, errors } = useForm()
   const [bio, setBio] = useState(undefined)
@@ -67,7 +67,7 @@ function IdentityModal({ address, show, handleClose }) {
           <Modal.Title>Account Identity</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Address: {address}
+          Address: {addressName || address}
           <br />
           Bio:{' '}
           {edit ? (

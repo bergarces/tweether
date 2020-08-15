@@ -37,6 +37,7 @@ module.exports = function(deployer, network, accounts) {
   let ens;
   let resolver;
   let registrar;
+  let reverseRegistrar;
 
   // Registry
   deployer.deploy(ENS)
@@ -62,10 +63,11 @@ module.exports = function(deployer, network, accounts) {
     return deployer.deploy(ReverseRegistrar, ens.address, resolver.address);
   })
   .then(function(reverseRegistrarInstance) {
+    reverseRegistrar = reverseRegistrarInstance
     return setupReverseRegistrar(ens, resolver, reverseRegistrarInstance, accounts);
   })
   .then(function() {
-    return setupAddresses(registrar, resolver, ens, accounts)
+    return setupAddresses(registrar, reverseRegistrar, resolver, ens, accounts)
   })
 };
 
@@ -87,17 +89,19 @@ async function setupReverseRegistrar(ens, resolver, reverseRegistrar, accounts) 
   await ens.setSubnodeOwner(namehash.hash("reverse"), utils.sha3("addr"), reverseRegistrar.address);
 }
 
-async function setupAddresses(registrar, resolver, ens, accounts) {
+async function setupAddresses(registrar, reverseRegistrar, resolver, ens, accounts) {
   const tweetherProxy = await TweetherProxy.deployed()
   const profile = await TweetherIdentity.deployed()
 
   await registrar.register(utils.sha3(ACCOUNT1_LABEL), accounts[0])
   await ens.setResolver(ACCOUNT1_NODE, resolver.address)
   await resolver.setAddr(ACCOUNT1_NODE, accounts[0])
+  await reverseRegistrar.setName(ACCOUNT1_ROOT_LABEL, { from: accounts[0] })
 
   await registrar.register(utils.sha3(ACCOUNT2_LABEL), accounts[0])
   await ens.setResolver(ACCOUNT2_NODE, resolver.address)
   await resolver.setAddr(ACCOUNT2_NODE, accounts[1])
+  await reverseRegistrar.setName(ACCOUNT2_ROOT_LABEL, { from: accounts[1] })
 
   await registrar.register(utils.sha3(TWEETHER_LABEL), accounts[0])
   await ens.setResolver(TWEETHER_NODE, resolver.address)
