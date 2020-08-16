@@ -10,7 +10,9 @@ The Tweether contract has been deployed with an upgradable proxy. This way, if a
 
 The tweeth data stays in the proxy contract, which just delegates the execution of the calls to the delegate contract. The delegate contract can be changed as long as the storage layout is compatible with the previous one.
 
-It is possible to implement upgradable contracts using the OpenZeppelin framework, but for this case a simple assembly contract with a fallback method and a method to update the delegate has been used.
+It is possible to implement upgradable contracts using the OpenZeppelin framework, but for this case I have used a method I'm already familiar with, in which it's not necessary to modify the layout of the main contract since we used a predefined storage slot for the contract logic, that being keccak256("PROXIABLE").
+
+Since we are using an upgradable contract, a non-constructor method is used to initialise the proxy contract.
 
 ## Restricting Access
 
