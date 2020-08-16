@@ -14,6 +14,9 @@ contract TweetherIdentity is Ownable {
 
   mapping(address => string) public bio;
 
+  /** @dev Constructor
+    * @param _maxBioBytes Maximum number of bytes.
+    */
   constructor(uint256 _maxBioBytes) public {
     maxBioBytes = _maxBioBytes;
   }

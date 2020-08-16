@@ -5,20 +5,14 @@ const Tweether = artifacts.require("Tweether");
 const TweetherIdentity = artifacts.require("TweetherIdentity");
 
 module.exports = function(deployer) {
-  let tweetherProxy;
+  deployer.then(async () => {
+    await deployer.deploy(Tweether, defaults.MAX_BYTES_TWEETH)
+    const tweether = await Tweether.deployed()
 
-  deployer.deploy(TweetherProxy)
-  .then(function(tweetherProxyInstance) {
-    tweetherProxy = tweetherProxyInstance;
-    return deployer.deploy(Tweether, defaults.MAX_BYTES_TWEETH);
+    const methodAbi = Tweether.abi.find(f => f.name === "setMaxTweethBytes")
+    const encodeConstructorCall = web3.eth.abi.encodeFunctionCall(methodAbi, [defaults.MAX_BYTES_TWEETH])
+    await deployer.deploy(TweetherProxy, encodeConstructorCall, tweether.address)
+
+    await deployer.deploy(TweetherIdentity, defaults.MAX_BYTES_BIO)
   })
-  .then(function(tweetherInstance) {
-    return setupProxy(tweetherProxy, tweetherInstance);
-  });
-
-  deployer.deploy(TweetherIdentity, defaults.MAX_BYTES_BIO);
 };
-
-async function setupProxy(proxy, delegate) {
-  await proxy.upgradeDelegate(delegate.address)
-}

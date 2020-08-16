@@ -3,9 +3,10 @@ pragma solidity ^0.6.0;
 pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "./Proxiable.sol";
 
 /** @title Send and view Tweeths */
-contract Tweether is Ownable {
+contract Tweether is Ownable, Proxiable {
   event TweethSent(
     address indexed _sender,
     uint256 indexed _nonce,
@@ -28,6 +29,9 @@ contract Tweether is Ownable {
 
   bool public circuitBreaker;
 
+  /** @dev Constructor
+    * @param _maxTweethBytes Maximum number of bytes.
+    */
   constructor(uint256 _maxTweethBytes) public {
     maxTweethBytes = _maxTweethBytes;
   }
@@ -83,5 +87,13 @@ contract Tweether is Ownable {
     */
   function getTweethHash(address _sender, uint256 _nonce) public pure returns (bytes32) {
     return keccak256(abi.encodePacked(_sender, _nonce));
+  }
+
+  /**
+    * Sets the address of the proxy contract
+    * @param _newContractLogic The address of the new DocumentRegistry
+    */
+  function updateImplementation(address _newContractLogic) public onlyOwner {
+    updateCodeAddress(_newContractLogic);
   }
 }

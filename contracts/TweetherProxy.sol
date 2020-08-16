@@ -1,32 +1,38 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.6.0;
 
-// Code based on
-// https://fravoll.github.io/solidity-patterns/proxy_delegate.html
-// https://medium.com/better-programming/solidity-0-6-x-features-fallback-and-receive-functions-69895e3ffe
-contract TweetherProxy {
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-  address internal delegate;
-  address owner = msg.sender;
+/** @title Proxy contract for Tweether */
+contract TweetherProxy is Ownable {
+  // Code position in storage is keccak256("PROXIABLE") = "0xc5f16f0fcc639fa48a6947836d9850f504798523bf8c9a3a87d5876cf622bcf7"
 
-  /** @dev Update delegate contract
-    * @param newDelegateAddress New address for the delegate contract
+  /** @dev Constructor
+    * @param _initialisingData Call mimicking the constructor to initialise the storage of the proxy
+    * @param _contractLogic Address of the Tweether contract logic
     */
-  function upgradeDelegate(address newDelegateAddress) public {
-    require(msg.sender == owner);
-    delegate = newDelegateAddress;
+  constructor(bytes memory _initialisingData, address _contractLogic) public {
+    assembly {
+      sstore(0xc5f16f0fcc639fa48a6947836d9850f504798523bf8c9a3a87d5876cf622bcf7, _contractLogic)
+    }
+    (bool success, ) = contractLogic.delegatecall(_initialisingData);
+    require(success, "Initialisation failed");
   }
 
   fallback() external payable {
-    address addr = delegate;
-
     assembly {
-      calldatacopy(0, 0, calldatasize())
-      let result := delegatecall(gas(), addr, 0, calldatasize(), 0, 0)
-      returndatacopy(0, 0, returndatasize())
-      switch result
-      case 0 { revert(0, returndatasize()) }
-      default { return(0, returndatasize()) }
+      let contractLogic := sload(0xc5f16f0fcc639fa48a6947836d9850f504798523bf8c9a3a87d5876cf622bcf7)
+      calldatacopy(0x0, 0x0, calldatasize())
+      let success := delegatecall(sub(gas(), 10000), contractLogic, 0x0, calldatasize(), 0, 0)
+      let retSz := returndatasize()
+      returndatacopy(0, 0, retSz)
+      switch success
+      case 0 {
+        revert(0, retSz)
+      }
+      default {
+        return(0, retSz)
+      }
     }
   }
 }
