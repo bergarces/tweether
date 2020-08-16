@@ -78,7 +78,7 @@ contract("Tweether", accounts => {
 
   describe("toggleCircuitBreaker", () => {
     it("should prevent sending new tweeths after it's been toggled", async () => {
-      await tweether.toggleCircuitBreaker()
+      await tweether.toggleCircuitBreaker({ from: accounts[0] })
 
       const circuitBreakerStatus = await tweether.circuitBreaker()
 
@@ -90,7 +90,7 @@ contract("Tweether", accounts => {
     })
 
     it("should be possible to enable sending new tweeths again", async () => {
-      await tweether.toggleCircuitBreaker()
+      await tweether.toggleCircuitBreaker({ from: accounts[0] })
 
       const circuitBreakerStatus = await tweether.circuitBreaker()
 
